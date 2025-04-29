@@ -1,0 +1,70 @@
+import argparse
+import io
+from pathlib import Path
+from rembg import new_session, remove
+from PIL import Image
+
+def parse_args():
+    p = argparse.ArgumentParser(
+        description="Extract the foreground from an image and save it to a new file."
+    )
+    p.add_argument(
+        "input_file",
+        type=Path,
+        help="Path to the input image file."
+    )
+    p.add_argument(
+        "--model",
+        default="isnet-anime",
+        help="Model to use for foreground extraction (default: isnet-anime). See rembg documentation for available models. (https://github.com/danielgatis/rembg?tab=readme-ov-file#models)"
+    )
+    p.add_argument(
+        "--angle",
+        type=float,
+        default=-90,
+        help="Angle for image rotation (default: -90)."
+    )
+    return p.parse_args()
+
+def extract_foreground(img_bytes, model):
+    print(f"Extracting foreground using model: {model}")
+    session = new_session(model)
+    return remove(img_bytes, session=session)
+
+def trim_and_rotate(image, angle, alpha_threshold=10):
+    img = Image.open(io.BytesIO(image)).convert("RGBA")
+    rotated = img.rotate(angle, expand=True)
+
+    alpha = rotated.getchannel("A")
+    mask = alpha.point(lambda a: 255 if a > alpha_threshold else 0)
+    bbox = mask.getbbox()
+
+    if bbox is None:
+        print("Warning: Could not detect non-transparent area. Cropping will not be applied.")
+        cropped = rotated
+    else:
+        cropped = rotated.crop(bbox)
+        print(f"Image Cropped and Rotated. Original size: {img.size}, New size: {cropped.size}")
+
+    with io.BytesIO() as buffer:
+        cropped.save(buffer, format="PNG")
+        return buffer.getvalue()
+
+def main():
+    args = parse_args()
+    input_path = args.input_file
+    if not input_path.exists():
+        print(f"Input file {input_path} does not exist.")
+        return
+
+    img_bytes = input_path.read_bytes()
+    foreground = extract_foreground(img_bytes, model=args.model)
+    result = trim_and_rotate(foreground, angle=args.angle)
+
+    output_name = f"{input_path.stem}_extracted{input_path.suffix}"
+    output_path = input_path.parent / output_name
+    output_path.write_bytes(result)
+    print(f"Extracted image saved to {output_path}")
+
+if __name__ == "__main__":
+    main()
