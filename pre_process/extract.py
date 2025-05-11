@@ -55,12 +55,11 @@ def process_file(file, model, angle):
         img_bytes = file.read_bytes()
         foreground = extract_foreground(img_bytes, model=model)
         result = trim_and_rotate(foreground, angle=angle)
-        output_name = f"{file.stem}_extracted{file.suffix}"
-        output_path = file.parent / output_name
-        output_path.write_bytes(result)
-        print(f"Extracted image saved to {output_path}")
+        print(f"Processed {file}: completed processing.")
+        return result
     except Exception as e:
         print(f"Failed to process file {file}: {e}")
+        return None
 
 def main():
     args = parse_args()
@@ -76,7 +75,14 @@ def main():
         files_to_process = [input_path]
 
     for file in files_to_process:
-        process_file(file, model=args.model, angle=args.angle)
+        result = process_file(file, model=args.model, angle=args.angle)
+        if result:
+            output_name = f"{file.stem}_extracted{file.suffix}"
+            output_path = file.parent / output_name
+            output_path.write_bytes(result)
+            print(f"Extracted image saved to {output_path}")
+        else:
+            print(f"Skipping {file} due to processing error.")
 
 if __name__ == "__main__":
     main()
