@@ -97,8 +97,14 @@ def main():
     for file in files_to_process:
         result = process_file(file, model=args.model, angle=args.angle)
         if result:
-            output_name = f"{file.stem}_extracted{file.suffix}"
-            output_path = output_dir / output_name
+            if input_path.is_file():
+                output_name = f"{file.stem}_extracted{file.suffix}"
+                output_path = output_dir / output_name
+            else:
+                relative = file.relative_to(input_path)
+                output_name = f"{relative.stem}_extracted{relative.suffix}"
+                output_path = output_dir / relative.parent / output_name
+                output_path.parent.mkdir(parents=True, exist_ok=True)
             output_path.write_bytes(result)
             print(f"Extracted image saved to {output_path}")
         else:
