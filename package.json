@@ -1,0 +1,44 @@
+{
+  "name": "charlab",
+  "version": "1.0.0",
+  "description": "キャラクターの360度画像を用いて、擬似的に3Dモデル風の表示を実現するソフトウェアです。",
+  "main": "index.js",
+  "scripts": {
+    "dev": "webpack --config webpack.main.config.js && webpack serve --config webpack.renderer.config.js",
+    "start": "npm run build && electron ./dist/main.js",
+    "build": "webpack --config webpack.main.config.js && webpack --config webpack.renderer.config.js",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.example.mascot",
+    "files": ["dist/**/*", "assets/**/*"],
+    "mac": { "target": ["dmg"] },
+    "win": { "target": ["nsis"] },
+    "linux": { "target": ["AppImage"] }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TenTakano/CharLab.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TenTakano/CharLab/issues"
+  },
+  "homepage": "https://github.com/TenTakano/CharLab#readme",
+  "dependencies": {
+    "electron": "^36.2.0"
+  },
+  "devDependencies": {
+    "@types/electron": "^1.4.38",
+    "@types/node": "^22.15.17",
+    "electron-builder": "^26.0.12",
+    "html-webpack-plugin": "^5.6.3",
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.8.3",
+    "webpack": "^5.99.8",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.1"
+  }
+}
