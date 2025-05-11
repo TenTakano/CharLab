@@ -69,12 +69,14 @@ def main():
         print(f"Input {input_path} does not exist.")
         return
 
+    files_to_process = []
     if input_path.is_dir():
-        for file in input_path.rglob("*"):
-            if file.is_file():
-                process_file(file, model=args.model, angle=args.angle)
+        files_to_process = [f for f in input_path.rglob("*") if f.is_file()]
     else:
-        process_file(input_path, model=args.model, angle=args.angle)
+        files_to_process = [input_path]
+
+    for file in files_to_process:
+        process_file(file, model=args.model, angle=args.angle)
 
 if __name__ == "__main__":
     main()
