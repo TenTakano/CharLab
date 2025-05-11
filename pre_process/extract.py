@@ -6,12 +6,17 @@ from PIL import Image
 
 def parse_args():
     p = argparse.ArgumentParser(
-        description="Extract the foreground from an image and save it to a new file."
+        description="Extract the foreground from an image and save it to a new file. Accepts a file or a directory (processes recursively)."
     )
     p.add_argument(
         "input_file",
         type=Path,
-        help="Path to the input image file."
+        help="Path to the input image file or directory."
+    )
+    p.add_argument(
+        "output_dir",
+        type=Path,
+        help="Path to the output directory."
     )
     p.add_argument(
         "--model",
@@ -50,21 +55,67 @@ def trim_and_rotate(image, angle, alpha_threshold=10):
         cropped.save(buffer, format="PNG")
         return buffer.getvalue()
 
+def process_file(file, model, angle):
+    try:
+        img_bytes = file.read_bytes()
+        foreground = extract_foreground(img_bytes, model=model)
+        result = trim_and_rotate(foreground, angle=angle)
+        print(f"Processed {file}: completed processing.")
+        return result
+    except Exception as e:
+        print(f"Failed to process file {file}: {e}")
+        return None
+
 def main():
     args = parse_args()
     input_path = args.input_file
+    output_dir = args.output_dir
+
     if not input_path.exists():
-        print(f"Input file {input_path} does not exist.")
+        print(f"Input {input_path} does not exist.")
         return
 
-    img_bytes = input_path.read_bytes()
-    foreground = extract_foreground(img_bytes, model=args.model)
-    result = trim_and_rotate(foreground, angle=args.angle)
+    if output_dir.exists():
+        if not output_dir.is_dir():
+            ans = input(f"{output_dir} exists and is not a directory. Do you want to continue? (y/n): ")
+            if ans.lower() != 'n':
+                exit("Aborted by user.")
+        else:
+            if any(output_dir.iterdir()):
+                ans = input(f"{output_dir} is not empty. Do you want to continue? (y/n): ")
+                if ans.lower() != 'n':
+                    exit("Aborted by user.")
 
-    output_name = f"{input_path.stem}_extracted{input_path.suffix}"
-    output_path = input_path.parent / output_name
-    output_path.write_bytes(result)
-    print(f"Extracted image saved to {output_path}")
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    files_to_process = []
+    if input_path.is_dir():
+        files_to_process = [f for f in input_path.rglob("*") if f.is_file()]
+    else:
+        files_to_process = [input_path]
+
+    success_count = 0
+    failed_count = 0
+
+    for file in files_to_process:
+        result = process_file(file, model=args.model, angle=args.angle)
+        if result:
+            if input_path.is_file():
+                output_name = f"{file.stem}_extracted{file.suffix}"
+                output_path = output_dir / output_name
+            else:
+                relative = file.relative_to(input_path)
+                output_name = f"{relative.stem}_extracted{relative.suffix}"
+                output_path = output_dir / relative.parent / output_name
+                output_path.parent.mkdir(parents=True, exist_ok=True)
+            output_path.write_bytes(result)
+            success_count += 1
+            print(f"Extracted image saved to {output_path}")
+        else:
+            failed_count += 1
+            print(f"Skipping {file} due to processing error.")
+
+    print(f"\nProcessing completed. Success: {success_count}, Failed: {failed_count}")
 
 if __name__ == "__main__":
     main()
