@@ -6,12 +6,12 @@ from PIL import Image
 
 def parse_args():
     p = argparse.ArgumentParser(
-        description="Extract the foreground from an image and save it to a new file."
+        description="Extract the foreground from an image and save it to a new file. Accepts a file or a directory (processes recursively)."
     )
     p.add_argument(
         "input_file",
         type=Path,
-        help="Path to the input image file."
+        help="Path to the input image file or directory."
     )
     p.add_argument(
         "--model",
@@ -50,21 +50,31 @@ def trim_and_rotate(image, angle, alpha_threshold=10):
         cropped.save(buffer, format="PNG")
         return buffer.getvalue()
 
+def process_file(file, model, angle):
+    try:
+        img_bytes = file.read_bytes()
+        foreground = extract_foreground(img_bytes, model=model)
+        result = trim_and_rotate(foreground, angle=angle)
+        output_name = f"{file.stem}_extracted{file.suffix}"
+        output_path = file.parent / output_name
+        output_path.write_bytes(result)
+        print(f"Extracted image saved to {output_path}")
+    except Exception as e:
+        print(f"Failed to process file {file}: {e}")
+
 def main():
     args = parse_args()
     input_path = args.input_file
     if not input_path.exists():
-        print(f"Input file {input_path} does not exist.")
+        print(f"Input {input_path} does not exist.")
         return
 
-    img_bytes = input_path.read_bytes()
-    foreground = extract_foreground(img_bytes, model=args.model)
-    result = trim_and_rotate(foreground, angle=args.angle)
-
-    output_name = f"{input_path.stem}_extracted{input_path.suffix}"
-    output_path = input_path.parent / output_name
-    output_path.write_bytes(result)
-    print(f"Extracted image saved to {output_path}")
+    if input_path.is_dir():
+        for file in input_path.rglob("*"):
+            if file.is_file():
+                process_file(file, model=args.model, angle=args.angle)
+    else:
+        process_file(input_path, model=args.model, angle=args.angle)
 
 if __name__ == "__main__":
     main()
