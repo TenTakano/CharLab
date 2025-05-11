@@ -94,6 +94,9 @@ def main():
     else:
         files_to_process = [input_path]
 
+    success_count = 0
+    failed_count = 0
+
     for file in files_to_process:
         result = process_file(file, model=args.model, angle=args.angle)
         if result:
@@ -106,9 +109,13 @@ def main():
                 output_path = output_dir / relative.parent / output_name
                 output_path.parent.mkdir(parents=True, exist_ok=True)
             output_path.write_bytes(result)
+            success_count += 1
             print(f"Extracted image saved to {output_path}")
         else:
+            failed_count += 1
             print(f"Skipping {file} due to processing error.")
+
+    print(f"\nProcessing completed. Success: {success_count}, Failed: {failed_count}")
 
 if __name__ == "__main__":
     main()
