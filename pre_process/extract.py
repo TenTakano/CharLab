@@ -14,6 +14,11 @@ def parse_args():
         help="Path to the input image file or directory."
     )
     p.add_argument(
+        "output_dir",
+        type=Path,
+        help="Path to the output directory."
+    )
+    p.add_argument(
         "--model",
         default="isnet-anime",
         help="Model to use for foreground extraction (default: isnet-anime). See rembg documentation for available models. (https://github.com/danielgatis/rembg?tab=readme-ov-file#models)"
@@ -64,9 +69,24 @@ def process_file(file, model, angle):
 def main():
     args = parse_args()
     input_path = args.input_file
+    output_dir = args.output_dir
+
     if not input_path.exists():
         print(f"Input {input_path} does not exist.")
         return
+
+    if output_dir.exists():
+        if not output_dir.is_dir():
+            ans = input(f"{output_dir} exists and is not a directory. Do you want to continue? (y/n): ")
+            if ans.lower() != 'n':
+                exit("Aborted by user.")
+        else:
+            if any(output_dir.iterdir()):
+                ans = input(f"{output_dir} is not empty. Do you want to continue? (y/n): ")
+                if ans.lower() != 'n':
+                    exit("Aborted by user.")
+
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     files_to_process = []
     if input_path.is_dir():
@@ -78,7 +98,7 @@ def main():
         result = process_file(file, model=args.model, angle=args.angle)
         if result:
             output_name = f"{file.stem}_extracted{file.suffix}"
-            output_path = file.parent / output_name
+            output_path = output_dir / output_name
             output_path.write_bytes(result)
             print(f"Extracted image saved to {output_path}")
         else:
