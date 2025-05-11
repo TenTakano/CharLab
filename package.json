@@ -4,7 +4,17 @@
   "description": "キャラクターの360度画像を用いて、擬似的に3Dモデル風の表示を実現するソフトウェアです。",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "webpack --config webpack.main.config.js && webpack serve --config webpack.renderer.config.js",
+    "start": "npm run build && electron ./dist/main.js",
+    "build": "webpack --config webpack.main.config.js && webpack --config webpack.renderer.config.js",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.example.mascot",
+    "files": ["dist/**/*", "assets/**/*"],
+    "mac": { "target": ["dmg"] },
+    "win": { "target": ["nsis"] },
+    "linux": { "target": ["AppImage"] }
   },
   "repository": {
     "type": "git",
