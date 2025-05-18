@@ -1,7 +1,7 @@
 const path = require("path");
 
 module.exports = {
-  entry: "./src/main.ts",
+  entry: "./src/main/main.ts",
   target: "electron-main",
   mode: process.env.NODE_ENV || "development",
   output: {
