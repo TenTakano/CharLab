@@ -2,7 +2,7 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-  entry: "./src/renderer.ts",
+  entry: "./src/renderer/renderer.ts",
   target: "electron-renderer",
   mode: process.env.NODE_ENV || "development",
   output: {
@@ -20,7 +20,7 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: "./src/index.html"
+      template: "./src/renderer/index.html"
     })
   ],
   devServer: {

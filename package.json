@@ -11,10 +11,25 @@
   },
   "build": {
     "appId": "com.example.mascot",
-    "files": ["dist/**/*", "assets/**/*"],
-    "mac": { "target": ["dmg"] },
-    "win": { "target": ["nsis"] },
-    "linux": { "target": ["AppImage"] }
+    "files": [
+      "dist/**/*",
+      "assets/**/*"
+    ],
+    "mac": {
+      "target": [
+        "dmg"
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ]
+    }
   },
   "repository": {
     "type": "git",
@@ -27,12 +42,10 @@
     "url": "https://github.com/TenTakano/CharLab/issues"
   },
   "homepage": "https://github.com/TenTakano/CharLab#readme",
-  "dependencies": {
-    "electron": "^36.2.0"
-  },
   "devDependencies": {
-    "@types/electron": "^1.4.38",
+    "@types/electron": "^1.6.12",
     "@types/node": "^22.15.17",
+    "electron": "^36.2.1",
     "electron-builder": "^26.0.12",
     "html-webpack-plugin": "^5.6.3",
     "ts-loader": "^9.5.2",
