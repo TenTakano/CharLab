@@ -1,19 +1,38 @@
-import { app, BrowserWindow } from 'electron';
-import * as path from 'path';
+import { app, BrowserWindow, dialog, ipcMain } from "electron";
+import * as path from "path";
+import * as fs from "fs";
 
-function createWindow() {
+import { SelectFolderResult } from "@/common/type";
+
+const createWindow = () => {
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 400,
+    height: 400,
+    transparent: true,
+    frame: false,
+    alwaysOnTop: true,
     webPreferences: {
-      // 開発用に簡単にするため nodeIntegration を有効化
-      nodeIntegration: true,
-      contextIsolation: false
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: path.join(__dirname, 'preload.js')
     }
   });
   win.loadFile(path.join(__dirname, 'index.html'));
 }
 
+ipcMain.handle("select-folder", async (): Promise<SelectFolderResult> => {
+  const { canceled, filePaths } = await dialog.showOpenDialog(
+    { properties: ["openDirectory"] }
+  );
+  if (canceled || filePaths.length === 0) {
+    return { canceled: true };
+  }
+  const folder = filePaths[0];
+  const files = await fs.promises.readdir(folder);
+  return { canceled: false, folder, files };
+});
+
+app.commandLine.appendSwitch("enable-logging");
 app.whenReady().then(createWindow);
 
 app.on('window-all-closed', () => {
