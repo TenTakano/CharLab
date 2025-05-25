@@ -2,15 +2,15 @@ import { app } from "electron";
 import Store from "electron-store";
 
 export interface Settings {
-  dirPath: string;
   windowWidth: number;
   windowHeight: number;
+  dirPath: string;
 }
 
 const defaults: Settings = {
-  dirPath: "",
   windowWidth: 800,
   windowHeight: 600,
+  dirPath: "",
 };
 
 const store = new Store<Settings>({
@@ -21,9 +21,9 @@ const store = new Store<Settings>({
 
 export function getSettings(): Settings {
   return {
-    dirPath: store.get("dirPath"),
     windowWidth: store.get("windowWidth"),
     windowHeight: store.get("windowHeight"),
+    dirPath: store.get("dirPath"),
   };
 }
 
@@ -36,4 +36,8 @@ export function getWindowSize(): { width: number; height: number } {
     width: store.get("windowWidth"),
     height: store.get("windowHeight"),
   };
+}
+
+export function getDirPath(): string {
+  return store.get("dirPath");
 }
