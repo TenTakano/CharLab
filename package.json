@@ -2,11 +2,11 @@
   "name": "charlab",
   "version": "1.0.0",
   "description": "キャラクターの360度画像を用いて、擬似的に3Dモデル風の表示を実現するソフトウェアです。",
-  "main": "index.js",
+  "main": "dist/main.js",
   "scripts": {
-    "dev": "webpack --config webpack.config.js",
+    "dev": "concurrently \"webpack --config webpack.main.js --watch\" \"webpack --config webpack.renderer.js --watch\" \"electron .\"",
+    "build": "webpack --mode production --config webpack.config.js",
     "start": "npm run build && electron ./dist/main.js",
-    "build": "webpack --config webpack.config.js",
     "dist": "electron-builder"
   },
   "build": {
@@ -45,6 +45,7 @@
   "devDependencies": {
     "@types/electron": "^1.6.12",
     "@types/node": "^22.15.17",
+    "concurrently": "^9.1.2",
     "electron": "^36.2.1",
     "electron-builder": "^26.0.12",
     "html-webpack-plugin": "^5.6.3",
