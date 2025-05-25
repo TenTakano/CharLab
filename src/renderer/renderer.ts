@@ -1,11 +1,6 @@
-console.log("Renderer process started");
-
 const loadButton = document.getElementById("load-button") as HTMLButtonElement;
 const widget = document.getElementById("widget") as HTMLDivElement;
 const imgElem = document.getElementById("widget-image") as HTMLImageElement;
-
-console.log("loadButton:", loadButton);
-if (!loadButton) throw new Error("`#load-button` が取れていません");
 
 let images: HTMLImageElement[] = [];
 let folderPath = "";
@@ -14,7 +9,6 @@ let isDragging = false;
 let startX = 0;
 
 loadButton.addEventListener("click", async () => {
-  console.log("Load button clicked");
   const result = await window.widgetAPI.selectFolder();
   if (result.canceled || !result.folder || !result.files) return;
 
@@ -34,7 +28,6 @@ loadButton.addEventListener("click", async () => {
 });
 
 widget.addEventListener("mousedown", e => {
-  console.log("mousedown", e);
   if (images.length === 0) return;
   isDragging = true;
   startX = e.clientX;
