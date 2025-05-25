@@ -3,11 +3,13 @@ import * as path from "path";
 import * as fs from "fs";
 
 import { SelectFolderResult } from "@/common/type";
+import { getWindowSize } from "./settings";
 
 const createWindow = () => {
+  const { width, height } = getWindowSize();
   const win = new BrowserWindow({
-    width: 400,
-    height: 400,
+    width,
+    height,
     transparent: true,
     frame: false,
     alwaysOnTop: true,
