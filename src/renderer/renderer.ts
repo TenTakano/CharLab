@@ -10,7 +10,7 @@ let currentIndex = 0;
 let isDragging = false;
 let startX = 0;
 
-loadButton.addEventListener("click", async () => {
+widget.addEventListener("contextmenu", async () => {
   const result = await window.widgetAPI.selectFolder();
   if (result.canceled || !result.folder || !result.files) return;
 
