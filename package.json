@@ -4,7 +4,7 @@
   "description": "キャラクターの360度画像を用いて、擬似的に3Dモデル風の表示を実現するソフトウェアです。",
   "main": "dist/main.js",
   "scripts": {
-    "dev":   "concurrently --kill-others-on-fail \"webpack --mode development --config webpack.config.js --watch\" \"electron .\"",
+    "dev":   "webpack --mode development --config webpack.config.js && concurrently --kill-others-on-fail \"webpack --mode development --config webpack.config.js --watch\" \"electron .\"",
     "build": "webpack --mode production --config webpack.config.js",
     "start": "npm run build && electron ./dist/main.js",
     "dist": "electron-builder"
