@@ -42,7 +42,7 @@ module.exports = (_env, argv) => {
       module: {
         rules: [
           ...common.module.rules,
-          { test: /\.(png|jpe?g|gif)$/, type: 'asset/resource' },
+          { test: /\.(png|jpe?g|gif|svg)$/, type: 'asset/resource' },
         ]
       }
     }

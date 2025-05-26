@@ -1,3 +1,5 @@
+import noimageUrl from "./assets/noimage.svg";
+
 const loadButton = document.getElementById("load-button") as HTMLButtonElement;
 const widget = document.getElementById("widget") as HTMLDivElement;
 const imgElem = document.getElementById("widget-image") as HTMLImageElement;
@@ -51,3 +53,5 @@ widget.addEventListener("mousemove", e => {
     widget.style.cursor = "grab";
   });
 });
+
+imgElem.src = noimageUrl;
