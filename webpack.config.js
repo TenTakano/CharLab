@@ -4,8 +4,33 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = (_env, argv) => {
   const common = {
     mode: argv.mode,
-    resolve: { extensions: ['.ts', '.js'] },
-    module: { rules: [{ test: /\.ts$/, use: 'ts-loader', exclude: /node_modules/ }] },
+    resolve: { extensions: ['.ts', '.tsx', '.js', '.jsx'] },
+    module: {
+      rules: [
+        {
+          test: /\.[jt]sx?$/,
+          exclude: /node_modules/,
+          use: {
+            loader: 'ts-loader',
+            options: { transpileOnly: true }
+          },
+        },
+        {
+          test: /\.css$/,
+          use: [
+            'style-loader',
+            {
+              loader: 'css-loader',
+              options: { importLoaders: 1 }
+            }
+          ]
+        },
+        {
+          test: /\.(png|jpe?g|gif|svg)$/,
+          type: 'asset/resource'
+        }
+      ]
+    },
     devtool: argv.mode === 'development' ? 'source-map' : false,
   };
 
@@ -26,7 +51,9 @@ module.exports = (_env, argv) => {
     {
       ...common,
       name: 'renderer',
-      entry: { renderer: './src/renderer/renderer.ts' },
+      entry: {
+        renderer: './src/renderer/index.tsx',
+      },
       target: 'electron-renderer',
       output: {
         path: path.resolve(__dirname, 'dist'),
@@ -34,17 +61,11 @@ module.exports = (_env, argv) => {
       },
       plugins: [
         new HtmlWebpackPlugin({
-          template: './src/renderer/index.html',
+          template: './public/index.html',
           filename: 'index.html',
           chunks: ['renderer'],
         })
       ],
-      module: {
-        rules: [
-          ...common.module.rules,
-          { test: /\.(png|jpe?g|gif|svg)$/, type: 'asset/resource' },
-        ]
-      }
     }
   ];
 }
