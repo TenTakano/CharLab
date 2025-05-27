@@ -61,7 +61,7 @@ module.exports = (_env, argv) => {
       },
       plugins: [
         new HtmlWebpackPlugin({
-          template: './src/renderer/index.html',
+          template: './public/index.html',
           filename: 'index.html',
           chunks: ['renderer'],
         })
