@@ -1,9 +1,13 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import noImage from "./assets/noimage.svg";
 
 const App: FC = () => {
   const [images, setImages] = useState<HTMLImageElement[]>([]);
   const [index, setIndex] = useState(0);
+
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const isDragging = useRef(false);
+  const startX = useRef(0);
 
   const handleSelectFolder = async () => {
     const result = await window.electronAPI.selectFolder();
@@ -45,11 +49,45 @@ const App: FC = () => {
     )
   };
 
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (images.length === 0 || isDragging.current) return;
+
+    isDragging.current = true;
+    startX.current = e.clientX;
+    wrapperRef.current!.style.cursor = "grabbing";
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isDragging.current) return;
+
+    const deltaX = e.clientX - startX.current;
+    const step = Math.floor(deltaX / 10);
+    if (step !== 0) {
+      const newIndex = (index + step + images.length) % images.length;
+      setIndex(newIndex);
+      startX.current = e.clientX;
+    }
+  };
+
+  const handleMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isDragging.current) return;
+
+    isDragging.current = false;
+    wrapperRef.current!.style.cursor = "grab";
+  };
+
   return (
-    <div onContextMenu={handleContextMenu}>
+    <div
+      ref={wrapperRef}
+      onContextMenu={handleContextMenu}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
+    >
       {images.length > 0
-        ? <img src={images[index].src} />
-        : <img src={noImage} />
+        ? <img src={images[index].src} draggable={false} />
+        : <img src={noImage} draggable={false} />
       }
     </div>
   );
