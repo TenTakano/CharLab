@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, Menu } from "electron";
 import * as path from "path";
 import * as fs from "fs";
 
@@ -15,6 +15,15 @@ ipcMain.handle("select-folder", async (): Promise<SelectFolderResult> => {
   const folder = filePaths[0];
   const files = await fs.promises.readdir(folder);
   return { canceled: false, folder, files };
+});
+
+ipcMain.on("show-context-menu", (event: Electron.IpcMainEvent, template: Electron.MenuItemConstructorOptions[], position: Electron.Point) => {
+  const menu = Menu.buildFromTemplate(template);
+  menu.popup({
+    window: BrowserWindow.fromWebContents(event.sender) || undefined,
+    x: position.x,
+    y: position.y
+  });
 });
 
 const createWindow = () => {
