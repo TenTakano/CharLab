@@ -18,7 +18,17 @@ ipcMain.handle("select-folder", async (): Promise<SelectFolderResult> => {
 });
 
 ipcMain.on("show-context-menu", (event: Electron.IpcMainEvent, template: Electron.MenuItemConstructorOptions[], position: Electron.Point) => {
-  const menu = Menu.buildFromTemplate(template);
+  const menuTemplate = template.map((item) => {
+    if (item.id) {
+      return {
+        ...item,
+        click: () => {event.sender.send("context-menu-command", item.id)},
+      }
+    } else {
+      return item;
+    }
+  })
+  const menu = Menu.buildFromTemplate(menuTemplate);
   menu.popup({
     window: BrowserWindow.fromWebContents(event.sender) || undefined,
     x: position.x,
