@@ -1,12 +1,29 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import type { SelectFolderResult } from "@/common/type";
-import { BrowserWindow, Menu, app, dialog, ipcMain } from "electron";
+import { BrowserWindow, Menu, app, dialog, ipcMain, screen } from "electron";
 import {
 	getWindowPosition,
 	getWindowSize,
 	setWindowPosition,
 } from "./settings";
+
+function getIntersectionArea(
+	rectA: Electron.Rectangle,
+	rectB: { x: number; y: number; width: number; height: number },
+): number {
+	const x1 = Math.max(rectA.x, rectB.x);
+	const y1 = Math.max(rectA.y, rectB.y);
+	const x2 = Math.min(rectA.x + rectA.width, rectB.x + rectB.width);
+	const y2 = Math.min(rectA.y + rectA.height, rectB.y + rectB.height);
+	// Return 0 if there is no intersection.
+	if (x2 <= x1 || y2 <= y1) {
+		return 0;
+	}
+	const width = x2 - x1;
+	const height = y2 - y1;
+	return width * height;
+}
 
 ipcMain.handle("select-folder", async (): Promise<SelectFolderResult> => {
 	const { canceled, filePaths } = await dialog.showOpenDialog({
@@ -61,10 +78,24 @@ ipcMain.on("move-window", (event, delta: { dx: number; dy: number }) => {
 const createWindow = () => {
 	const { width, height } = getWindowSize();
 	const savedPos = getWindowPosition();
-	const win = new BrowserWindow({
+
+	let useSavedPos = false;
+	if (savedPos) {
+		const windowRect = { x: savedPos.x, y: savedPos.y, width, height };
+		const display = screen.getDisplayMatching(windowRect);
+		const workArea = display.workArea;
+
+		const visibleArea = getIntersectionArea(workArea, windowRect);
+		const windowArea = width * height;
+		// If less than 1/3 of the window is visible, ignore savedPos.
+		if (visibleArea >= windowArea / 3) {
+			useSavedPos = true;
+		}
+	}
+
+	const browserWindowOptions: Electron.BrowserWindowConstructorOptions = {
 		width,
 		height,
-		...(savedPos ? { x: savedPos.x, y: savedPos.y } : {}),
 		transparent: true,
 		frame: false,
 		alwaysOnTop: true,
@@ -73,7 +104,13 @@ const createWindow = () => {
 			contextIsolation: true,
 			preload: path.join(__dirname, "preload.js"),
 		},
-	});
+	};
+	if (useSavedPos && savedPos) {
+		browserWindowOptions.x = savedPos.x;
+		browserWindowOptions.y = savedPos.y;
+	}
+
+	const win = new BrowserWindow(browserWindowOptions);
 	win.loadFile(path.join(__dirname, "index.html"));
 };
 
