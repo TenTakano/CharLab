@@ -44,6 +44,14 @@ ipcMain.on(
 	},
 );
 
+ipcMain.on("move-window", (event, delta: { dx: number; dy: number }) => {
+	const win = BrowserWindow.fromWebContents(event.sender);
+	if (win) {
+		const [x, y] = win.getPosition();
+		win.setPosition(x + delta.dx, y + delta.dy);
+	}
+});
+
 const createWindow = () => {
 	const { width, height } = getWindowSize();
 	const win = new BrowserWindow({
