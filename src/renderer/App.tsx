@@ -6,8 +6,11 @@ const App: FC = () => {
 	const [index, setIndex] = useState(0);
 
 	const wrapperRef = useRef<HTMLDivElement>(null);
-	const isDragging = useRef(false);
+
+	const isRotating = useRef(false);
+	const isMovingWindow = useRef(false);
 	const startX = useRef(0);
+	const lastScreen = useRef({ x: 0, y: 0 });
 
 	const handleSelectFolder = useCallback(async () => {
 		const result = await window.electronAPI.selectFolder();
@@ -46,30 +49,46 @@ const App: FC = () => {
 	};
 
 	const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-		if (images.length === 0 || isDragging.current) return;
+		if (e.shiftKey) {
+			isMovingWindow.current = true;
+			lastScreen.current = { x: e.screenX, y: e.screenY };
+			wrapperRef.current!.style.cursor = "move";
+			return;
+		}
 
-		isDragging.current = true;
+		if (images.length === 0) return;
+
+		isRotating.current = true;
 		startX.current = e.clientX;
 		wrapperRef.current!.style.cursor = "grabbing";
 	};
 
 	const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-		if (!isDragging.current) return;
+		if (isMovingWindow.current) {
+			const dx = e.screenX - lastScreen.current.x;
+			const dy = e.screenY - lastScreen.current.y;
+			lastScreen.current = { x: e.screenX, y: e.screenY };
+			window.electronAPI.moveWindow({ dx, dy });
+			return;
+		}
 
-		const deltaX = e.clientX - startX.current;
-		const step = Math.floor(deltaX / 10);
-		if (step !== 0) {
-			const newIndex = (index + step + images.length) % images.length;
-			setIndex(newIndex);
-			startX.current = e.clientX;
+		if (isRotating.current) {
+			const deltaX = e.clientX - startX.current;
+			const step = Math.floor(deltaX / 10);
+			if (step !== 0) {
+				const newIndex = (index + step + images.length) % images.length;
+				setIndex(newIndex);
+				startX.current = e.clientX;
+			}
 		}
 	};
 
 	const handleMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
-		if (!isDragging.current) return;
-
-		isDragging.current = false;
-		wrapperRef.current!.style.cursor = "grab";
+		if (isMovingWindow.current || isRotating.current) {
+			isMovingWindow.current = false;
+			isRotating.current = false;
+			wrapperRef.current!.style.cursor = "grab";
+		}
 	};
 
 	return (
