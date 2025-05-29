@@ -4,13 +4,15 @@
 	"description": "キャラクターの360度画像を用いて、擬似的に3Dモデル風の表示を実現するソフトウェアです。",
 	"main": "dist/main.js",
 	"scripts": {
-		"dev": "webpack --mode development --config webpack.config.js && concurrently --kill-others-on-fail \"webpack --mode development --config webpack.config.js --watch\" \"electron .\"",
-		"build": "webpack --mode production --config webpack.config.js",
+		"prepare": "husky",
+		"dev": "webpack --mode development --config webpack.config.js && concurrently --kill-others-on-fail \"tailwindcss -i ./src/renderer/styles/global.css -o ./src/renderer/styles/tailwind.css --watch\" \"webpack --mode development --config webpack.config.js --watch\" \"electron . --no-sandbox\"",
+		"build": "npm run build:app && npm run build:css",
+		"build:app": "webpack --mode production --config webpack.config.js",
+		"build:css": "tailwindcss -i ./src/renderer/styles/global.css -o ./src/renderer/styles/tailwind.css --minify",
 		"start": "npm run build && electron ./dist/main.js",
 		"dist": "electron-builder",
 		"format": "biome format --write .",
-		"lint": "biome check --write .",
-		"prepare": "husky"
+		"lint": "biome check --write ."
 	},
 	"build": {
 		"appId": "com.example.mascot",
@@ -56,8 +58,10 @@
 		"webpack-dev-server": "^5.2.1"
 	},
 	"dependencies": {
+		"@tailwindcss/cli": "^4.1.8",
 		"electron-store": "^10.0.1",
 		"react": "^19.1.0",
-		"react-dom": "^19.1.0"
+		"react-dom": "^19.1.0",
+		"tailwindcss": "^4.1.8"
 	}
 }
