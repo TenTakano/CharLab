@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from "electron";
 
-import { SelectFolderResult } from "@/common/type";
+import type { SelectFolderResult } from "@/common/type";
 
 declare global {
 	interface Window {

@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from "react";
+import { type FC, useCallback, useEffect, useRef, useState } from "react";
 import noImage from "./assets/noimage.svg";
 
 const App: FC = () => {
@@ -9,7 +9,7 @@ const App: FC = () => {
 	const isDragging = useRef(false);
 	const startX = useRef(0);
 
-	const handleSelectFolder = async () => {
+	const handleSelectFolder = useCallback(async () => {
 		const result = await window.electronAPI.selectFolder();
 		if (result.canceled || !result.folder || !result.files) return;
 
@@ -25,7 +25,7 @@ const App: FC = () => {
 			setImages(newImages);
 			console.log("loaded");
 		}
-	};
+	}, []);
 
 	useEffect(() => {
 		window.electronAPI.onMenuItemClicked((id: string) => {
@@ -34,7 +34,7 @@ const App: FC = () => {
 				handleSelectFolder();
 			}
 		});
-	}, []);
+	}, [handleSelectFolder]);
 
 	const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
 		e.preventDefault();

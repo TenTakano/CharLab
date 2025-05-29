@@ -9,7 +9,7 @@
 		"start": "npm run build && electron ./dist/main.js",
 		"dist": "electron-builder",
 		"format": "biome format --write .",
-		"lint": "biome check ."
+		"lint": "biome check --write ."
 	},
 	"build": {
 		"appId": "com.example.mascot",

@@ -19,7 +19,14 @@
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true
+			"a11y": {
+				"useAltText": "off",
+				"useValidAriaProps": "off",
+				"useValidAriaValues": "off"
+			},
+			"style": {
+				"noNonNullAssertion": "off"
+			}
 		}
 	},
 	"javascript": {

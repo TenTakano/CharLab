@@ -1,8 +1,8 @@
-import { app, BrowserWindow, dialog, ipcMain, Menu } from "electron";
-import * as path from "path";
-import * as fs from "fs";
+import * as fs from "node:fs";
+import * as path from "node:path";
+import { BrowserWindow, Menu, app, dialog, ipcMain } from "electron";
 
-import { SelectFolderResult } from "@/common/type";
+import type { SelectFolderResult } from "@/common/type";
 import { getWindowSize } from "./settings";
 
 ipcMain.handle("select-folder", async (): Promise<SelectFolderResult> => {
@@ -32,9 +32,8 @@ ipcMain.on(
 						event.sender.send("context-menu-command", item.id);
 					},
 				};
-			} else {
-				return item;
 			}
+			return item;
 		});
 		const menu = Menu.buildFromTemplate(menuTemplate);
 		menu.popup({
