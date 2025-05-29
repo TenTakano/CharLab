@@ -1,7 +1,10 @@
+stagedFiles=$(git diff --cached --name-only)
+
 npm run format
-git add -A
+[ -n "$stagedFiles" ] && git add $stagedFiles
 
 if npm run lint; then
+  [ -n "$stagedFiles" ] && git add $stagedFiles
   echo "✅ lint passed, committing…"
   exit 0
 else
