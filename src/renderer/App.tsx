@@ -1,7 +1,7 @@
 import { type FC, useCallback, useEffect, useRef, useState } from "react";
 
-import noImage from "./assets/noimage.svg";
-import ContextMenu from "./components/ContextMenu";
+import noImage from "@ui/assets/noimage.svg";
+import ContextMenu from "@ui/components/ContextMenu";
 
 const App: FC = () => {
 	const [showContextMenu, setShowContextMenu] = useState(false);

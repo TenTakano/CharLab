@@ -10,7 +10,10 @@
 		"sourceMap": true,
 		"baseUrl": ".",
 		"paths": {
-			"@/*": ["src/*"]
+			"@/*": ["src/*"],
+			"@main/*": ["src/main/*"],
+			"@ui/*": ["src/renderer/*"],
+			"@preload/*": ["src/preload/*"]
 		},
 		"jsx": "react-jsx",
 		"jsxImportSource": "react",
