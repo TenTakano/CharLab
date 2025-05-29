@@ -23,13 +23,11 @@ const App: FC = () => {
 
 		if (newImages.length > 0) {
 			setImages(newImages);
-			console.log("loaded");
 		}
 	}, []);
 
 	useEffect(() => {
 		window.electronAPI.onMenuItemClicked((id: string) => {
-			console.log(`Menu item clicked: ${id}`);
 			if (id === "select-folder") {
 				handleSelectFolder();
 			}
