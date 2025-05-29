@@ -1,68 +1,61 @@
 {
-  "name": "charlab",
-  "version": "1.0.0",
-  "description": "キャラクターの360度画像を用いて、擬似的に3Dモデル風の表示を実現するソフトウェアです。",
-  "main": "dist/main.js",
-  "scripts": {
-    "dev": "webpack --mode development --config webpack.config.js && concurrently --kill-others-on-fail \"webpack --mode development --config webpack.config.js --watch\" \"electron .\"",
-    "build": "webpack --mode production --config webpack.config.js",
-    "start": "npm run build && electron ./dist/main.js",
-    "dist": "electron-builder"
-  },
-  "build": {
-    "appId": "com.example.mascot",
-    "files": [
-      "dist/**/*",
-      "assets/**/*"
-    ],
-    "mac": {
-      "target": [
-        "dmg"
-      ]
-    },
-    "win": {
-      "target": [
-        "nsis"
-      ]
-    },
-    "linux": {
-      "target": [
-        "AppImage"
-      ]
-    }
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/TenTakano/CharLab.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/TenTakano/CharLab/issues"
-  },
-  "homepage": "https://github.com/TenTakano/CharLab#readme",
-  "devDependencies": {
-    "@biomejs/biome": "1.9.4",
-    "@types/electron": "^1.6.12",
-    "@types/node": "^22.15.17",
-    "@types/react": "^19.1.5",
-    "@types/react-dom": "^19.1.5",
-    "concurrently": "^9.1.2",
-    "css-loader": "^7.1.2",
-    "electron": "^36.2.1",
-    "electron-builder": "^26.0.12",
-    "html-webpack-plugin": "^5.6.3",
-    "style-loader": "^4.0.0",
-    "ts-loader": "^9.5.2",
-    "typescript": "^5.8.3",
-    "webpack": "^5.99.8",
-    "webpack-cli": "^6.0.1",
-    "webpack-dev-server": "^5.2.1"
-  },
-  "dependencies": {
-    "electron-store": "^10.0.1",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0"
-  }
+	"name": "charlab",
+	"version": "1.0.0",
+	"description": "キャラクターの360度画像を用いて、擬似的に3Dモデル風の表示を実現するソフトウェアです。",
+	"main": "dist/main.js",
+	"scripts": {
+		"dev": "webpack --mode development --config webpack.config.js && concurrently --kill-others-on-fail \"webpack --mode development --config webpack.config.js --watch\" \"electron .\"",
+		"build": "webpack --mode production --config webpack.config.js",
+		"start": "npm run build && electron ./dist/main.js",
+		"dist": "electron-builder",
+		"format": "biome format --write .",
+		"lint": "biome check ."
+	},
+	"build": {
+		"appId": "com.example.mascot",
+		"files": ["dist/**/*", "assets/**/*"],
+		"mac": {
+			"target": ["dmg"]
+		},
+		"win": {
+			"target": ["nsis"]
+		},
+		"linux": {
+			"target": ["AppImage"]
+		}
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/TenTakano/CharLab.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/TenTakano/CharLab/issues"
+	},
+	"homepage": "https://github.com/TenTakano/CharLab#readme",
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4",
+		"@types/electron": "^1.6.12",
+		"@types/node": "^22.15.17",
+		"@types/react": "^19.1.5",
+		"@types/react-dom": "^19.1.5",
+		"concurrently": "^9.1.2",
+		"css-loader": "^7.1.2",
+		"electron": "^36.2.1",
+		"electron-builder": "^26.0.12",
+		"html-webpack-plugin": "^5.6.3",
+		"style-loader": "^4.0.0",
+		"ts-loader": "^9.5.2",
+		"typescript": "^5.8.3",
+		"webpack": "^5.99.8",
+		"webpack-cli": "^6.0.1",
+		"webpack-dev-server": "^5.2.1"
+	},
+	"dependencies": {
+		"electron-store": "^10.0.1",
+		"react": "^19.1.0",
+		"react-dom": "^19.1.0"
+	}
 }
