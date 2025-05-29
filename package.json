@@ -43,6 +43,7 @@
   },
   "homepage": "https://github.com/TenTakano/CharLab#readme",
   "devDependencies": {
+    "@biomejs/biome": "1.9.4",
     "@types/electron": "^1.6.12",
     "@types/node": "^22.15.17",
     "@types/react": "^19.1.5",
