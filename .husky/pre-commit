@@ -1,0 +1,13 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+npm run format
+git add -A
+
+if npm run lint; then
+  echo "✅ lint passed, committing…"
+  exit 0
+else
+  echo "🚨 lint errors detected, aborting commit."
+  exit 1
+fi
