@@ -1,7 +1,15 @@
 import { type FC, useCallback, useEffect, useRef, useState } from "react";
+
 import noImage from "./assets/noimage.svg";
+import ContextMenu from "./components/ContextMenu";
 
 const App: FC = () => {
+	const [showContextMenu, setShowContextMenu] = useState(false);
+	const [contextMenuPosition, setContextMenuPosition] = useState({
+		x: 0,
+		y: 0,
+	});
+
 	const [images, setImages] = useState<HTMLImageElement[]>([]);
 	const [index, setIndex] = useState(0);
 
@@ -39,13 +47,8 @@ const App: FC = () => {
 
 	const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
 		e.preventDefault();
-
-		const template = [{ id: "select-folder", label: "Select Folder" }];
-
-		window.electronAPI.showContextMenu(template, {
-			x: e.clientX,
-			y: e.clientY,
-		});
+		setContextMenuPosition({ x: e.clientX, y: e.clientY });
+		setShowContextMenu(true);
 	};
 
 	const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -100,6 +103,7 @@ const App: FC = () => {
 			onMouseUp={handleMouseUp}
 			onMouseLeave={handleMouseUp}
 		>
+			<ContextMenu show={showContextMenu} position={contextMenuPosition} />
 			{images.length > 0 ? (
 				<img src={images[index].src} draggable={false} />
 			) : (
