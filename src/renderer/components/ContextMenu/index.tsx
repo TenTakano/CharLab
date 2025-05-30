@@ -1,4 +1,4 @@
-import { type FC, useEffect, useState } from "react";
+import { type FC, useEffect, useRef, useState } from "react";
 
 type ContextMenuButtonProps = {
 	onClick: (item: string) => void;
@@ -28,14 +28,34 @@ type Props = {
 	show: boolean;
 	position: { x: number; y: number };
 	onSelectDirectory: () => void;
+	onClose: () => void;
 };
 
-const ContextMenu: FC<Props> = ({ show, position, onSelectDirectory }) => {
-	const [showContextMenu, setShowContextMenu] = useState(show);
+const ContextMenu: FC<Props> = ({
+	show,
+	position,
+	onSelectDirectory,
+	onClose,
+}) => {
+	const contextMenuRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
-		setShowContextMenu(show);
-	}, [show]);
+		if (!show) return;
+
+		const handleClickOutside = (event: MouseEvent) => {
+			if (
+				contextMenuRef.current &&
+				!contextMenuRef.current.contains(event.target as Node)
+			) {
+				onClose();
+			}
+		};
+
+		document.addEventListener("mousedown", handleClickOutside);
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+	}, [show, onClose]);
 
 	const handleClickMenuButton = (item: string) => {
 		switch (item) {
@@ -46,13 +66,15 @@ const ContextMenu: FC<Props> = ({ show, position, onSelectDirectory }) => {
 				break;
 		}
 
-		setShowContextMenu(false);
+		onClose();
 	};
 
+	if (!show) return null;
 	return (
 		<div
-			className={`${showContextMenu ? "block" : "hidden"} absolute bg-white dark:bg-gray-800 shadow-lg rounded-md ring-1 ring-black ring-opacity-5 w-48 py-2`}
+			className="absolute bg-white dark:bg-gray-800 shadow-lg rounded-md ring-1 ring-black ring-opacity-5 w-48 py-2"
 			style={{ left: position.x, top: position.y }}
+			ref={contextMenuRef}
 		>
 			<ContextMenuButton onClick={handleClickMenuButton}>
 				Select Folder

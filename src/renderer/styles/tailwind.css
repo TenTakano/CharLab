@@ -251,12 +251,6 @@
 			max-width: 96rem;
 		}
 	}
-	.block {
-		display: block;
-	}
-	.hidden {
-		display: none;
-	}
 	.w-48 {
 		width: calc(var(--spacing) * 48);
 	}

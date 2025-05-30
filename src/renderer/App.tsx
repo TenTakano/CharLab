@@ -99,6 +99,7 @@ const App: FC = () => {
 				show={showContextMenu}
 				position={contextMenuPosition}
 				onSelectDirectory={handleSelectFolder}
+				onClose={() => setShowContextMenu(false)}
 			/>
 			{images.length > 0 ? (
 				<img src={images[index].src} draggable={false} />
