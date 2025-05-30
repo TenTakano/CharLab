@@ -257,14 +257,27 @@
 	.hidden {
 		display: none;
 	}
+	.table {
+		display: table;
+	}
 	.w-48 {
 		width: calc(var(--spacing) * 48);
 	}
 	.w-full {
 		width: 100%;
 	}
+	.border-collapse {
+		border-collapse: collapse;
+	}
+	.resize {
+		resize: both;
+	}
 	.rounded-md {
 		border-radius: var(--radius-md);
+	}
+	.border {
+		border-style: var(--tw-border-style);
+		border-width: 1px;
 	}
 	.bg-white {
 		background-color: var(--color-white);
@@ -281,6 +294,9 @@
 	.text-gray-700 {
 		color: var(--color-gray-700);
 	}
+	.underline {
+		text-decoration-line: underline;
+	}
 	.shadow-lg {
 		--tw-shadow: 0 10px 15px -3px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0
 			4px 6px -4px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
@@ -294,6 +310,10 @@
 	}
 	.ring-black {
 		--tw-ring-color: var(--color-black);
+	}
+	.outline {
+		outline-style: var(--tw-outline-style);
+		outline-width: 1px;
 	}
 	.hover\:bg-gray-100 {
 		&:hover {
@@ -334,6 +354,11 @@ img {
 	max-width: 100%;
 	max-height: 100%;
 	object-fit: contain;
+}
+@property --tw-border-style {
+	syntax: "*";
+	inherits: false;
+	initial-value: solid;
 }
 @property --tw-shadow {
 	syntax: "*";
@@ -400,6 +425,11 @@ img {
 	inherits: false;
 	initial-value: 0 0 #0000;
 }
+@property --tw-outline-style {
+	syntax: "*";
+	inherits: false;
+	initial-value: solid;
+}
 @layer properties {
 	@supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or
 		((-moz-orient: inline) and (not (color: rgb(from red r g b)))) {
@@ -407,6 +437,7 @@ img {
 		::before,
 		::after,
 		::backdrop {
+			--tw-border-style: solid;
 			--tw-shadow: 0 0 #0000;
 			--tw-shadow-color: initial;
 			--tw-shadow-alpha: 100%;
@@ -421,6 +452,7 @@ img {
 			--tw-ring-offset-width: 0px;
 			--tw-ring-offset-color: #fff;
 			--tw-ring-offset-shadow: 0 0 #0000;
+			--tw-outline-style: solid;
 		}
 	}
 }
