@@ -37,14 +37,6 @@ const App: FC = () => {
 		}
 	}, []);
 
-	useEffect(() => {
-		window.electronAPI.onMenuItemClicked((id: string) => {
-			if (id === "select-folder") {
-				handleSelectFolder();
-			}
-		});
-	}, [handleSelectFolder]);
-
 	const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
 		e.preventDefault();
 		setContextMenuPosition({ x: e.clientX, y: e.clientY });
