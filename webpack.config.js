@@ -4,7 +4,15 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 module.exports = (_env, argv) => {
 	const common = {
 		mode: argv.mode,
-		resolve: { extensions: [".ts", ".tsx", ".js", ".jsx"] },
+		resolve: {
+			extensions: [".ts", ".tsx", ".js", ".jsx"],
+			alias: {
+				"@": path.resolve(__dirname, "src"),
+				"@main": path.resolve(__dirname, "src/main"),
+				"@ui": path.resolve(__dirname, "src/renderer"),
+				"@preload": path.resolve(__dirname, "src/preload"),
+			},
+		},
 		module: {
 			rules: [
 				{
