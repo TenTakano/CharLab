@@ -1,4 +1,4 @@
-import { type FC, useEffect, useRef, useState } from "react";
+import { type FC, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 type ContextMenuButtonProps = {
 	onClick: (item: string) => void;
@@ -38,6 +38,25 @@ const ContextMenu: FC<Props> = ({
 	onClose,
 }) => {
 	const contextMenuRef = useRef<HTMLDivElement>(null);
+	const [pos, setPos] = useState(position);
+
+	useLayoutEffect(() => {
+		if (!show || !contextMenuRef.current) return;
+
+		const { innerWidth, innerHeight } = window;
+		const { width: menuWidth, height: menuHeight } =
+			contextMenuRef.current.getBoundingClientRect();
+		let x = position.x;
+		let y = position.y;
+
+		if (x + menuWidth > innerWidth) {
+			x = Math.max(0, innerWidth - menuWidth - 10);
+		}
+		if (y + menuHeight > innerHeight) {
+			y = Math.max(0, innerHeight - menuHeight - 10);
+		}
+		setPos({ x, y });
+	}, [show, position]);
 
 	useEffect(() => {
 		if (!show) return;
@@ -73,7 +92,7 @@ const ContextMenu: FC<Props> = ({
 	return (
 		<div
 			className="absolute bg-white dark:bg-gray-800 shadow-lg rounded-md ring-1 ring-black ring-opacity-5 w-48 py-2"
-			style={{ left: position.x, top: position.y }}
+			style={{ left: pos.x, top: pos.y }}
 			ref={contextMenuRef}
 		>
 			<ContextMenuButton onClick={handleClickMenuButton}>
