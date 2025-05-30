@@ -98,9 +98,6 @@ const ContextMenu: FC<Props> = ({
 			<ContextMenuButton onClick={handleClickMenuButton}>
 				Select Folder
 			</ContextMenuButton>
-			<ContextMenuButton onClick={() => {}}>Resize Widget</ContextMenuButton>
-			<ContextMenuButton onClick={() => {}}>Change Theme</ContextMenuButton>
-			<ContextMenuButton onClick={() => {}}>Widget Settings</ContextMenuButton>
 		</div>
 	);
 };
