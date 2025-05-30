@@ -1,29 +1,5 @@
 import { type FC, useEffect, useLayoutEffect, useRef, useState } from "react";
 
-type ContextMenuButtonProps = {
-	onClick: (item: string) => void;
-	children: React.ReactNode;
-};
-
-const ContextMenuButton: FC<ContextMenuButtonProps> = ({
-	onClick,
-	children,
-}) => {
-	const handleClick = () => {
-		onClick(children as string);
-	};
-
-	return (
-		<button
-			type="button"
-			className="w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-			onClick={handleClick}
-		>
-			{children}
-		</button>
-	);
-};
-
 type Props = {
 	show: boolean;
 	position: { x: number; y: number };
@@ -91,13 +67,25 @@ const ContextMenu: FC<Props> = ({
 	if (!show) return null;
 	return (
 		<div
-			className="absolute bg-white dark:bg-gray-800 shadow-lg rounded-md ring-1 ring-black ring-opacity-5 w-48 py-2"
+			className="absolute bg-white shadow-lg rounded-md ring-1 ring-black ring-opacity-5 w-48 py-2"
 			style={{ left: pos.x, top: pos.y }}
 			ref={contextMenuRef}
 		>
-			<ContextMenuButton onClick={handleClickMenuButton}>
-				Select Folder
-			</ContextMenuButton>
+			{[
+				"Select Folder",
+				"Resize Widget",
+				"Change Theme",
+				"Widget Settings",
+			].map((label) => (
+				<button
+					key={label}
+					type="button"
+					className="w-full text-left px-4 py-2 text-gray-700 hover:bg-emerald-200"
+					onClick={() => handleClickMenuButton(label)}
+				>
+					{label}
+				</button>
+			))}
 		</div>
 	);
 };
