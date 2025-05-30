@@ -1,4 +1,4 @@
-import { type FC, useCallback, useEffect, useRef, useState } from "react";
+import { type FC, useCallback, useRef, useState } from "react";
 
 import noImage from "@ui/assets/noimage.svg";
 import ContextMenu from "@ui/components/ContextMenu";
@@ -95,7 +95,11 @@ const App: FC = () => {
 			onMouseUp={handleMouseUp}
 			onMouseLeave={handleMouseUp}
 		>
-			<ContextMenu show={showContextMenu} position={contextMenuPosition} />
+			<ContextMenu
+				show={showContextMenu}
+				position={contextMenuPosition}
+				onSelectDirectory={handleSelectFolder}
+			/>
 			{images.length > 0 ? (
 				<img src={images[index].src} draggable={false} />
 			) : (
