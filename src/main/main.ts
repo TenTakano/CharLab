@@ -34,7 +34,7 @@ ipcMain.handle("select-folder", async (): Promise<SelectFolderResult> => {
 	}
 	const folder = filePaths[0];
 	const files = await loadFiles(folder);
-	return { canceled: false, folder, files };
+	return { canceled: false, files };
 });
 
 ipcMain.on("move-window", (event, delta: { dx: number; dy: number }) => {

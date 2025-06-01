@@ -22,7 +22,7 @@ const App: FC = () => {
 
 	const handleSelectFolder = useCallback(async () => {
 		const result = await window.electronAPI.selectFolder();
-		if (result.canceled || !result.folder || !result.files) return;
+		if (result.canceled || !result.files) return;
 
 		const newImages = result.files.map((file) => {
 			const img = new Image();
