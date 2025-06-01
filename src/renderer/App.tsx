@@ -20,6 +20,22 @@ const App: FC = () => {
 	const startX = useRef(0);
 	const lastScreen = useRef({ x: 0, y: 0 });
 
+	useEffect(() => {
+		window.electronAPI.onInitialState((cachedFiles: string[]) => {
+			const newImages = cachedFiles
+				.sort((a, b) => a.localeCompare(b))
+				.map((file) => {
+					const img = new Image();
+					img.src = `file://${file}`;
+					return img;
+				});
+
+			if (newImages.length > 0) {
+				setImages(newImages);
+			}
+		});
+	}, []);
+
 	const handleSelectFolder = useCallback(async () => {
 		const result = await window.electronAPI.selectFolder();
 		if (result.canceled || !result.files) return;

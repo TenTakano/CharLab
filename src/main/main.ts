@@ -1,7 +1,7 @@
 import * as path from "node:path";
 import type { SelectFolderResult } from "@/common/type";
 import { BrowserWindow, app, dialog, ipcMain, screen } from "electron";
-import { loadFiles } from "./image_loader";
+import { loadCachedImages, loadFiles } from "./image_loader";
 import {
 	getWindowPosition,
 	getWindowSize,
@@ -88,7 +88,13 @@ const createWindow = () => {
 };
 
 app.commandLine.appendSwitch("enable-logging");
-app.whenReady().then(createWindow);
+app.whenReady().then(async () => {
+	createWindow();
+	const win = BrowserWindow.getAllWindows()[0];
+	win.webContents.once("did-finish-load", async () => {
+		win.webContents.send("cached-images", await loadCachedImages());
+	});
+});
 
 app.on("window-all-closed", () => {
 	if (process.platform !== "darwin") app.quit();

@@ -9,6 +9,19 @@ if (!fsSync.existsSync(cacheDir)) {
 	fsSync.mkdirSync(cacheDir, { recursive: true });
 }
 
+export async function loadCachedImages(): Promise<string[]> {
+	try {
+		const files = await fs.readdir(cacheDir);
+		const imageFiles = files
+			.filter((file) => /\.(jpg|jpeg|png|gif|webp)$/i.test(file))
+			.map((file) => path.join(cacheDir, file));
+		return imageFiles;
+	} catch (error) {
+		console.error(`Error reading cache directory "${cacheDir}":`, error);
+		throw error;
+	}
+}
+
 async function saveCachePersistent(origPath: string): Promise<string> {
 	const fileName = path.basename(origPath);
 	const { name, ext } = path.parse(fileName);
