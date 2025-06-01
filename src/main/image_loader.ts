@@ -1,14 +1,15 @@
-import * as fs from "node:fs";
+import * as fsSync from "node:fs";
+import * as fs from "node:fs/promises";
 import path from "node:path";
 import { app } from "electron";
 
 const userDataDir = app.getPath("userData");
 const cacheDir = path.join(userDataDir, "image_cache");
-if (!fs.existsSync(cacheDir)) {
-	fs.mkdirSync(cacheDir, { recursive: true });
+if (!fsSync.existsSync(cacheDir)) {
+	fsSync.mkdirSync(cacheDir, { recursive: true });
 }
 
-function saveCachePersistent(origPath: string): string {
+async function saveCachePersistent(origPath: string): Promise<string> {
 	const fileName = path.basename(origPath);
 	const { name, ext } = path.parse(fileName);
 	let newName = name;
@@ -19,20 +20,20 @@ function saveCachePersistent(origPath: string): string {
 	}
 	const newFileName = `${newName}${ext}`;
 	const outPath = path.join(cacheDir, newFileName);
-	fs.writeFileSync(outPath, fs.readFileSync(origPath));
-	return newFileName;
+	await fs.writeFile(outPath, await fs.readFile(origPath));
+	return outPath;
 }
 
 export async function loadFiles(folderPath: string): Promise<string[]> {
 	try {
-		const entries = await fs.promises.readdir(folderPath);
+		const entries = await fs.readdir(folderPath);
 		const files = entries
 			.filter((file) => /\.(jpg|jpeg|png|gif|webp)$/i.test(file))
-			.map((file) => {
+			.map(async (file) => {
 				const filePath = path.join(folderPath, file);
-				return saveCachePersistent(filePath);
+				return await saveCachePersistent(filePath);
 			});
-		return files;
+		return await Promise.all(files);
 	} catch (error) {
 		console.error(`Error reading folder "${folderPath}":`, error);
 		throw error;

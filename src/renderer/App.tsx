@@ -26,7 +26,7 @@ const App: FC = () => {
 
 		const newImages = result.files.map((file) => {
 			const img = new Image();
-			img.src = `file://${result.folder}/${file}`;
+			img.src = `file://${file}`;
 			return img;
 		});
 
