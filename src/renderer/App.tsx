@@ -24,13 +24,11 @@ const App: FC = () => {
 		const result = await window.electronAPI.selectFolder();
 		if (result.canceled || !result.folder || !result.files) return;
 
-		const newImages = result.files
-			.filter((file) => /\.(jpg|jpeg|png|gif)$/i.test(file))
-			.map((file) => {
-				const img = new Image();
-				img.src = `file://${result.folder}/${file}`;
-				return img;
-			});
+		const newImages = result.files.map((file) => {
+			const img = new Image();
+			img.src = `file://${result.folder}/${file}`;
+			return img;
+		});
 
 		if (newImages.length > 0) {
 			setImages(newImages);
