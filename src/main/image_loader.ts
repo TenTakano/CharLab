@@ -51,7 +51,7 @@ async function saveCachePersistent(origPath: string): Promise<string> {
 	return outPath;
 }
 
-export async function loadFiles(folderPath: string): Promise<string[]> {
+export async function cacheFiles(folderPath: string): Promise<string[]> {
 	await clearCache();
 
 	try {
