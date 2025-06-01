@@ -9,6 +9,20 @@ if (!fsSync.existsSync(cacheDir)) {
 	fsSync.mkdirSync(cacheDir, { recursive: true });
 }
 
+export async function clearCache(): Promise<void> {
+	try {
+		const files = await fs.readdir(cacheDir);
+		await Promise.all(
+			files.map((file) =>
+				fs.rm(path.join(cacheDir, file), { recursive: true, force: true }),
+			),
+		);
+	} catch (error) {
+		console.error(`Error clearing cache directory "${cacheDir}":`, error);
+		throw error;
+	}
+}
+
 export async function loadCachedImages(): Promise<string[]> {
 	try {
 		const files = await fs.readdir(cacheDir);
@@ -38,6 +52,8 @@ async function saveCachePersistent(origPath: string): Promise<string> {
 }
 
 export async function loadFiles(folderPath: string): Promise<string[]> {
+	await clearCache();
+
 	try {
 		const entries = await fs.readdir(folderPath);
 		const files = entries
