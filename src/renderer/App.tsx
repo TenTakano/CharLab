@@ -20,11 +20,8 @@ const App: FC = () => {
 	const startX = useRef(0);
 	const lastScreen = useRef({ x: 0, y: 0 });
 
-	const handleSelectFolder = useCallback(async () => {
-		const result = await window.electronAPI.selectFolder();
-		if (result.canceled || !result.files) return;
-
-		const newImages = result.files
+	const prepareImages = useCallback((files: string[]) => {
+		const newImages = files
 			.sort((a, b) => a.localeCompare(b))
 			.map((file) => {
 				const img = new Image();
@@ -36,6 +33,19 @@ const App: FC = () => {
 			setImages(newImages);
 		}
 	}, []);
+
+	useEffect(() => {
+		window.electronAPI.onInitialState((cachedFiles: string[]) => {
+			prepareImages(cachedFiles);
+		});
+	}, [prepareImages]);
+
+	const handleSelectFolder = useCallback(async () => {
+		const result = await window.electronAPI.selectFolder();
+		if (result.canceled || !result.files) return;
+
+		prepareImages(result.files);
+	}, [prepareImages]);
 
 	const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
 		e.preventDefault();
