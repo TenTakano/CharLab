@@ -24,11 +24,13 @@ const App: FC = () => {
 		const result = await window.electronAPI.selectFolder();
 		if (result.canceled || !result.files) return;
 
-		const newImages = result.files.map((file) => {
-			const img = new Image();
-			img.src = `file://${file}`;
-			return img;
-		});
+		const newImages = result.files
+			.sort((a, b) => a.localeCompare(b))
+			.map((file) => {
+				const img = new Image();
+				img.src = `file://${file}`;
+				return img;
+			});
 
 		if (newImages.length > 0) {
 			setImages(newImages);
