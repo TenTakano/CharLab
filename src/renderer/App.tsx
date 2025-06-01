@@ -1,4 +1,4 @@
-import { type FC, useCallback, useRef, useState } from "react";
+import { type FC, useCallback, useEffect, useRef, useState } from "react";
 
 import noImage from "@ui/assets/noimage.svg";
 import ContextMenu from "@ui/components/ContextMenu";
@@ -9,11 +9,11 @@ const App: FC = () => {
 		x: 0,
 		y: 0,
 	});
-
 	const [images, setImages] = useState<HTMLImageElement[]>([]);
 	const [index, setIndex] = useState(0);
 
 	const wrapperRef = useRef<HTMLDivElement>(null);
+	const canvasRef = useRef<HTMLCanvasElement>(null);
 
 	const isRotating = useRef(false);
 	const isMovingWindow = useRef(false);
@@ -43,6 +43,34 @@ const App: FC = () => {
 		setShowContextMenu(true);
 	};
 
+	useEffect(() => {
+		const canvas = canvasRef.current;
+		if (!canvas) return;
+		const ctx = canvas.getContext("2d");
+		if (!ctx) return;
+
+		let img: HTMLImageElement;
+		if (images.length > 0) {
+			img = images[index];
+		} else {
+			img = new Image();
+			img.src = noImage;
+		}
+
+		const drawImage = () => {
+			canvas.width = img.naturalWidth || 300;
+			canvas.height = img.naturalHeight || 300;
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			ctx.drawImage(img, 0, 0);
+		};
+
+		if (img.complete) {
+			drawImage();
+		} else {
+			img.onload = drawImage;
+		}
+	}, [images, index]);
+
 	const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
 		if (e.shiftKey) {
 			isMovingWindow.current = true;
@@ -52,7 +80,6 @@ const App: FC = () => {
 		}
 
 		if (images.length === 0) return;
-
 		isRotating.current = true;
 		startX.current = e.clientX;
 		wrapperRef.current!.style.cursor = "grabbing";
@@ -101,11 +128,7 @@ const App: FC = () => {
 				onSelectDirectory={handleSelectFolder}
 				onClose={() => setShowContextMenu(false)}
 			/>
-			{images.length > 0 ? (
-				<img src={images[index].src} draggable={false} />
-			) : (
-				<img src={noImage} draggable={false} />
-			)}
+			<canvas ref={canvasRef} style={{ display: "block" }} />
 		</div>
 	);
 };
