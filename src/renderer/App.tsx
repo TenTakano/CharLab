@@ -37,6 +37,11 @@ const App: FC = () => {
 	useEffect(() => {
 		window.electronAPI.onInitialState((cachedFiles: string[]) => {
 			prepareImages(cachedFiles);
+
+			if (!wrapperRef.current || !canvasRef.current) return;
+			const { clientWidth, clientHeight } = wrapperRef.current;
+			canvasRef.current.width = clientWidth;
+			canvasRef.current.height = clientHeight;
 		});
 	}, [prepareImages]);
 
@@ -68,10 +73,12 @@ const App: FC = () => {
 		}
 
 		const drawImage = () => {
-			canvas.width = img.naturalWidth || 300;
-			canvas.height = img.naturalHeight || 300;
+			const imgWidth = img.naturalWidth || img.width;
+			const imgHeight = img.naturalHeight || img.height;
+			const x = (canvas.width - imgWidth) / 2;
+			const y = (canvas.height - imgHeight) / 2;
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
-			ctx.drawImage(img, 0, 0);
+			ctx.drawImage(img, x, y);
 		};
 
 		if (img.complete) {
@@ -126,6 +133,7 @@ const App: FC = () => {
 	return (
 		<div
 			ref={wrapperRef}
+			className="w-screen h-screen cursor-grab"
 			onContextMenu={handleContextMenu}
 			onMouseDown={handleMouseDown}
 			onMouseMove={handleMouseMove}
@@ -138,7 +146,7 @@ const App: FC = () => {
 				onSelectDirectory={handleSelectFolder}
 				onClose={() => setShowContextMenu(false)}
 			/>
-			<canvas ref={canvasRef} style={{ display: "block" }} />
+			<canvas ref={canvasRef} className="w-full h-full block" />
 		</div>
 	);
 };
