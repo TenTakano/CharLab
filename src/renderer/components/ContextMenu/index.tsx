@@ -7,6 +7,63 @@ const ImageSizeMap: Record<string, { width: number; height: number }> = {
 	Large: { width: 500, height: 1000 },
 };
 
+type ResizeSubmenuProps = {
+	onResize: (size: { width: number; height: number }) => void;
+};
+
+const ResizeSubmenu: FC<ResizeSubmenuProps> = ({ onResize }) => {
+	const submenuRef = useRef<HTMLDivElement>(null);
+	const [leftOffset, setLeftOffset] = useState<number | string>("100%");
+	const [topOffset, setTopOffset] = useState<number | string>("100%");
+
+	useLayoutEffect(() => {
+		if (!submenuRef.current || !submenuRef.current.parentElement) return;
+
+		const submenuRect = submenuRef.current.getBoundingClientRect();
+		const parentRect = submenuRef.current.parentElement.getBoundingClientRect();
+		const overflowRight = Math.max(
+			0,
+			parentRect.left +
+				parentRect.width +
+				submenuRect.width -
+				window.innerWidth,
+		);
+		let newLeftOffset = parentRect.width - overflowRight;
+		newLeftOffset = Math.max(newLeftOffset, -parentRect.left);
+		setLeftOffset(newLeftOffset);
+
+		const overflowBottom = Math.max(
+			0,
+			parentRect.top +
+				parentRect.height +
+				submenuRect.height -
+				window.innerHeight,
+		);
+		let newTopOffset = parentRect.height - overflowBottom;
+		newTopOffset = Math.max(newTopOffset, -parentRect.top);
+		setTopOffset(newTopOffset);
+	}, []);
+
+	return (
+		<div
+			ref={submenuRef}
+			className="absolute top-0 bg-white shadow-lg rounded-md ring-1 ring-black ring-opacity-5 w-40 py-2"
+			style={{ left: leftOffset, top: topOffset }}
+		>
+			{Object.keys(ImageSizeMap).map((option) => (
+				<button
+					key={option}
+					type="button"
+					className="w-full text-left px-4 py-2 text-gray-700 hover:bg-emerald-200"
+					onClick={() => onResize(ImageSizeMap[option])}
+				>
+					{`${option}(${ImageSizeMap[option].width}x${ImageSizeMap[option].height})`}
+				</button>
+			))}
+		</div>
+	);
+};
+
 type Props = {
 	show: boolean;
 	position: { x: number; y: number };
@@ -67,8 +124,7 @@ const ContextMenu: FC<Props> = ({
 		onClose();
 	};
 
-	const handleResizeOption = (option: string) => {
-		const size = ImageSizeMap[option];
+	const handleResizeOption = (size: { width: number; height: number }) => {
 		onResize(size);
 		closeContextMenu();
 	};
@@ -100,7 +156,6 @@ const ContextMenu: FC<Props> = ({
 				Select Folder
 			</button>
 
-			{/* Resize Widget with sub-menu */}
 			<div
 				className="relative"
 				onMouseEnter={() => setResizeHover(true)}
@@ -112,20 +167,7 @@ const ContextMenu: FC<Props> = ({
 				>
 					Resize Widget
 				</button>
-				{resizeHover && (
-					<div className="absolute left-full top-0 bg-white shadow-lg rounded-md ring-1 ring-black ring-opacity-5 w-40 py-2">
-						{Object.keys(ImageSizeMap).map((option) => (
-							<button
-								key={option}
-								type="button"
-								className="w-full text-left px-4 py-2 text-gray-700 hover:bg-emerald-200"
-								onClick={() => handleResizeOption(option)}
-							>
-								{option}
-							</button>
-						))}
-					</div>
-				)}
+				{resizeHover && <ResizeSubmenu onResize={handleResizeOption} />}
 			</div>
 		</div>
 	);
