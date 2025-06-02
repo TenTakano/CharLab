@@ -10,6 +10,7 @@ import {
 	getWindowPosition,
 	getWindowSize,
 	setWindowPosition,
+	setWindowSize,
 } from "./settings";
 
 function getIntersectionArea(
@@ -38,7 +39,8 @@ ipcMain.handle("select-folder", async (): Promise<SelectFolderResult> => {
 	}
 	const folder = filePaths[0];
 	await cacheFiles(folder);
-	await generateResizedCache(300, 300);
+	const { width, height } = getWindowSize();
+	await generateResizedCache(width, height);
 	return { canceled: false, files: await loadCachedImages() };
 });
 
@@ -46,9 +48,11 @@ ipcMain.on(
 	"change-image-size",
 	async (event, size: { width: number; height: number }) => {
 		await generateResizedCache(size.width, size.height);
+		setWindowSize(size.width, size.height);
 		const win = BrowserWindow.fromWebContents(event.sender);
 		if (win) {
 			win.webContents.send("images-ready", await loadCachedImages());
+			win.setSize(size.width, size.height);
 		}
 	},
 );

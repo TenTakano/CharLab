@@ -47,6 +47,11 @@ export function getWindowSize(): { width: number; height: number } {
 	};
 }
 
+export function setWindowSize(width: number, height: number): void {
+	store.set("windowWidth", width);
+	store.set("windowHeight", height);
+}
+
 export function getWindowPosition(): { x: number; y: number } {
 	return store.get("windowPosition");
 }
