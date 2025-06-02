@@ -31,11 +31,12 @@ const App: FC = () => {
 
 		if (newImages.length > 0) {
 			setImages(newImages);
+			setIndex(0);
 		}
 	}, []);
 
 	useEffect(() => {
-		window.electronAPI.onInitialState((cachedFiles: string[]) => {
+		window.electronAPI.onImagesReady((cachedFiles: string[]) => {
 			prepareImages(cachedFiles);
 
 			if (!wrapperRef.current || !canvasRef.current) return;
@@ -51,6 +52,13 @@ const App: FC = () => {
 
 		prepareImages(result.files);
 	}, [prepareImages]);
+
+	const handleSizeChange = useCallback(
+		(size: { width: number; height: number }) => {
+			window.electronAPI.changeImageSize(size);
+		},
+		[],
+	);
 
 	const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
 		e.preventDefault();
@@ -144,6 +152,7 @@ const App: FC = () => {
 				show={showContextMenu}
 				position={contextMenuPosition}
 				onSelectDirectory={handleSelectFolder}
+				onResize={handleSizeChange}
 				onClose={() => setShowContextMenu(false)}
 			/>
 			<canvas ref={canvasRef} className="w-full h-full block" />
