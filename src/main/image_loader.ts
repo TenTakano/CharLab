@@ -2,11 +2,13 @@ import * as fsSync from "node:fs";
 import * as fs from "node:fs/promises";
 import path from "node:path";
 import { app } from "electron";
+import sharp from "sharp";
 
 const userDataDir = app.getPath("userData");
 const cacheDir = path.join(userDataDir, "image_cache");
-if (!fsSync.existsSync(cacheDir)) {
-	fsSync.mkdirSync(cacheDir, { recursive: true });
+const resizedCacheDir = path.join(cacheDir, "resized");
+if (!fsSync.existsSync(resizedCacheDir)) {
+	fsSync.mkdirSync(resizedCacheDir, { recursive: true });
 }
 
 export async function clearCache(): Promise<void> {
@@ -25,13 +27,13 @@ export async function clearCache(): Promise<void> {
 
 export async function loadCachedImages(): Promise<string[]> {
 	try {
-		const files = await fs.readdir(cacheDir);
+		const files = await fs.readdir(resizedCacheDir);
 		const imageFiles = files
 			.filter((file) => /\.(jpg|jpeg|png|gif|webp)$/i.test(file))
-			.map((file) => path.join(cacheDir, file));
+			.map((file) => path.join(resizedCacheDir, file));
 		return imageFiles;
 	} catch (error) {
-		console.error(`Error reading cache directory "${cacheDir}":`, error);
+		console.error(`Error reading cache directory "${resizedCacheDir}":`, error);
 		throw error;
 	}
 }
@@ -51,7 +53,7 @@ async function saveCachePersistent(origPath: string): Promise<string> {
 	return outPath;
 }
 
-export async function cacheFiles(folderPath: string): Promise<string[]> {
+export async function cacheFiles(folderPath: string): Promise<void> {
 	await clearCache();
 
 	try {
@@ -62,9 +64,37 @@ export async function cacheFiles(folderPath: string): Promise<string[]> {
 				const filePath = path.join(folderPath, file);
 				return await saveCachePersistent(filePath);
 			});
-		return await Promise.all(files);
+		await Promise.all(files);
 	} catch (error) {
 		console.error(`Error reading folder "${folderPath}":`, error);
+		throw error;
+	}
+}
+
+export async function generateResizedCache(
+	maxWidth: number,
+	maxHeight: number,
+): Promise<void> {
+	try {
+		const files = (await fs.readdir(cacheDir)).filter((file) =>
+			/\.(jpg|jpeg|png|gif|webp)$/i.test(file),
+		);
+		if (files.length === 0) return;
+
+		await !fs.rm(resizedCacheDir, { recursive: true, force: true });
+		await fs.mkdir(resizedCacheDir, { recursive: true });
+
+		for (const input of files) {
+			const inputPath = path.join(cacheDir, input);
+			const { name } = path.parse(input);
+			const outputPath = path.join(resizedCacheDir, `${name}.png`);
+
+			await sharp(inputPath)
+				.resize({ width: maxWidth, height: maxHeight, fit: "inside" })
+				.toFile(outputPath);
+		}
+	} catch (error) {
+		console.error(`Error Recreating "${resizedCacheDir}"`, error);
 		throw error;
 	}
 }

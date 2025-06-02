@@ -1,7 +1,11 @@
 import * as path from "node:path";
 import type { SelectFolderResult } from "@/common/type";
 import { BrowserWindow, app, dialog, ipcMain, screen } from "electron";
-import { cacheFiles, loadCachedImages } from "./image_loader";
+import {
+	cacheFiles,
+	generateResizedCache,
+	loadCachedImages,
+} from "./image_loader";
 import {
 	getWindowPosition,
 	getWindowSize,
@@ -33,8 +37,9 @@ ipcMain.handle("select-folder", async (): Promise<SelectFolderResult> => {
 		return { canceled: true };
 	}
 	const folder = filePaths[0];
-	const files = await cacheFiles(folder);
-	return { canceled: false, files };
+	await cacheFiles(folder);
+	await generateResizedCache(300, 300);
+	return { canceled: false, files: await loadCachedImages() };
 });
 
 ipcMain.on("move-window", (event, delta: { dx: number; dy: number }) => {
