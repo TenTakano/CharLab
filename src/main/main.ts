@@ -89,6 +89,9 @@ const createWindow = () => {
 	const browserWindowOptions: Electron.BrowserWindowConstructorOptions = {
 		width,
 		height,
+		resizable: false,
+		maximizable: false,
+		minimizable: true,
 		transparent: true,
 		frame: false,
 		alwaysOnTop: true,
