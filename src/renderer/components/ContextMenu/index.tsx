@@ -1,6 +1,21 @@
 import { on } from "node:events";
 import { type FC, useEffect, useLayoutEffect, useRef, useState } from "react";
 
+const Button: FC<React.ButtonHTMLAttributes<HTMLButtonElement>> = ({
+	children,
+	...props
+}) => {
+	return (
+		<button
+			type="button"
+			className="w-full text-left px-4 py-2 text-gray-700 hover:bg-emerald-200"
+			{...props}
+		>
+			{children}
+		</button>
+	);
+};
+
 const ImageSizeMap: Record<string, { width: number; height: number }> = {
 	Small: { width: 300, height: 600 },
 	Medium: { width: 400, height: 800 },
@@ -51,14 +66,9 @@ const ResizeSubmenu: FC<ResizeSubmenuProps> = ({ onResize }) => {
 			style={{ left: leftOffset, top: topOffset }}
 		>
 			{Object.keys(ImageSizeMap).map((option) => (
-				<button
-					key={option}
-					type="button"
-					className="w-full text-left px-4 py-2 text-gray-700 hover:bg-emerald-200"
-					onClick={() => onResize(ImageSizeMap[option])}
-				>
+				<Button key={option} onClick={() => onResize(ImageSizeMap[option])}>
 					{`${option}(${ImageSizeMap[option].width}x${ImageSizeMap[option].height})`}
-				</button>
+				</Button>
 			))}
 		</div>
 	);
@@ -148,25 +158,18 @@ const ContextMenu: FC<Props> = ({
 			style={{ left: pos.x, top: pos.y }}
 			ref={contextMenuRef}
 		>
-			<button
-				type="button"
-				className="w-full text-left px-4 py-2 text-gray-700 hover:bg-emerald-200"
-				onClick={() => handleClickMenuButton("Select Folder")}
-			>
+			<Button onClick={() => handleClickMenuButton("Select Folder")}>
 				Select Folder
-			</button>
+			</Button>
 
 			<div
 				className="relative"
 				onMouseEnter={() => setResizeHover(true)}
 				onMouseLeave={() => setResizeHover(false)}
 			>
-				<button
-					type="button"
-					className="w-full text-left px-4 py-2 text-gray-700 hover:bg-emerald-200"
-				>
+				<Button onClick={() => handleClickMenuButton("Resize Widget")}>
 					Resize Widget
-				</button>
+				</Button>
 				{resizeHover && <ResizeSubmenu onResize={handleResizeOption} />}
 			</div>
 		</div>
