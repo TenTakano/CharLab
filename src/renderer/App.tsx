@@ -46,6 +46,16 @@ const App: FC = () => {
 		});
 	}, [prepareImages]);
 
+	useEffect(() => {
+		window.electronAPI.onWindowSizeChange(
+			(size: { width: number; height: number }) => {
+				if (!wrapperRef.current || !canvasRef.current) return;
+				canvasRef.current.width = size.width;
+				canvasRef.current.height = size.height;
+			},
+		);
+	}, []);
+
 	const handleSelectFolder = useCallback(async () => {
 		const result = await window.electronAPI.selectFolder();
 		if (result.canceled || !result.files) return;

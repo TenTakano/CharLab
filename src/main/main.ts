@@ -13,22 +13,15 @@ import {
 	setWindowSize,
 } from "./settings";
 
-function getIntersectionArea(
-	rectA: Electron.Rectangle,
-	rectB: { x: number; y: number; width: number; height: number },
-): number {
-	const x1 = Math.max(rectA.x, rectB.x);
-	const y1 = Math.max(rectA.y, rectB.y);
-	const x2 = Math.min(rectA.x + rectA.width, rectB.x + rectB.width);
-	const y2 = Math.min(rectA.y + rectA.height, rectB.y + rectB.height);
-	// Return 0 if there is no intersection.
-	if (x2 <= x1 || y2 <= y1) {
-		return 0;
-	}
-	const width = x2 - x1;
-	const height = y2 - y1;
-	return width * height;
-}
+const changeWindowSize = (
+	win: BrowserWindow,
+	size: { width: number; height: number },
+) => {
+	win.setResizable(true);
+	win.setSize(size.width, size.height);
+	win.setResizable(false);
+	win.webContents.send("window-size-change", size);
+};
 
 ipcMain.handle("select-folder", async (): Promise<SelectFolderResult> => {
 	const { canceled, filePaths } = await dialog.showOpenDialog({
@@ -52,9 +45,7 @@ ipcMain.on(
 		const win = BrowserWindow.fromWebContents(event.sender);
 		if (win) {
 			win.webContents.send("images-ready", await loadCachedImages());
-			win.setResizable(true);
-			win.setSize(size.width, size.height);
-			win.setResizable(false);
+			changeWindowSize(win, size);
 		}
 	},
 );
@@ -69,6 +60,23 @@ ipcMain.on("move-window", (event, delta: { dx: number; dy: number }) => {
 		setWindowPosition(newX, newY);
 	}
 });
+
+function getIntersectionArea(
+	rectA: Electron.Rectangle,
+	rectB: { x: number; y: number; width: number; height: number },
+): number {
+	const x1 = Math.max(rectA.x, rectB.x);
+	const y1 = Math.max(rectA.y, rectB.y);
+	const x2 = Math.min(rectA.x + rectA.width, rectB.x + rectB.width);
+	const y2 = Math.min(rectA.y + rectA.height, rectB.y + rectB.height);
+	// Return 0 if there is no intersection.
+	if (x2 <= x1 || y2 <= y1) {
+		return 0;
+	}
+	const width = x2 - x1;
+	const height = y2 - y1;
+	return width * height;
+}
 
 const createWindow = () => {
 	const { width, height } = getWindowSize();
