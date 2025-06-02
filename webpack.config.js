@@ -55,6 +55,7 @@ module.exports = (_env, argv) => {
 				path: path.resolve(__dirname, "dist"),
 				filename: "[name].js",
 			},
+			externals: [{ sharp: "commonjs sharp" }],
 		},
 		{
 			...common,
