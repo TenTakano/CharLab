@@ -46,6 +46,16 @@ const App: FC = () => {
 		});
 	}, [prepareImages]);
 
+	useEffect(() => {
+		window.electronAPI.onWindowSizeChange(
+			(size: { width: number; height: number }) => {
+				if (!wrapperRef.current || !canvasRef.current) return;
+				canvasRef.current.width = size.width;
+				canvasRef.current.height = size.height;
+			},
+		);
+	}, []);
+
 	const handleSelectFolder = useCallback(async () => {
 		const result = await window.electronAPI.selectFolder();
 		if (result.canceled || !result.files) return;
@@ -86,6 +96,8 @@ const App: FC = () => {
 			const x = (canvas.width - imgWidth) / 2;
 			const y = (canvas.height - imgHeight) / 2;
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			ctx.fillStyle = "white";
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
 			ctx.drawImage(img, x, y);
 		};
 

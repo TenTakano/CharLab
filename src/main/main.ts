@@ -10,7 +10,56 @@ import {
 	getWindowPosition,
 	getWindowSize,
 	setWindowPosition,
+	setWindowSize,
 } from "./settings";
+
+const changeWindowSize = (
+	win: BrowserWindow,
+	size: { width: number; height: number },
+) => {
+	win.setResizable(true);
+	win.setSize(size.width, size.height);
+	win.setResizable(false);
+	win.webContents.send("window-size-change", size);
+};
+
+ipcMain.handle("select-folder", async (): Promise<SelectFolderResult> => {
+	const { canceled, filePaths } = await dialog.showOpenDialog({
+		properties: ["openDirectory"],
+	});
+	if (canceled || filePaths.length === 0) {
+		return { canceled: true };
+	}
+	const folder = filePaths[0];
+	await cacheFiles(folder);
+	const { width, height } = getWindowSize();
+	await generateResizedCache(width, height);
+	return { canceled: false, files: await loadCachedImages() };
+});
+
+ipcMain.on(
+	"change-image-size",
+	async (event, size: { width: number; height: number }) => {
+		await generateResizedCache(size.width, size.height);
+		setWindowSize(size.width, size.height);
+		const win = BrowserWindow.fromWebContents(event.sender);
+		if (win) {
+			win.webContents.send("images-ready", await loadCachedImages());
+			changeWindowSize(win, size);
+		}
+	},
+);
+
+ipcMain.on("move-window", (event, delta: { dx: number; dy: number }) => {
+	const win = BrowserWindow.fromWebContents(event.sender);
+	if (win) {
+		const [x, y] = win.getPosition();
+		const newX = x + delta.dx;
+		const newY = y + delta.dy;
+		win.setPosition(newX, newY);
+		setWindowPosition(newX, newY);
+	}
+});
 
 function getIntersectionArea(
 	rectA: Electron.Rectangle,
@@ -28,41 +77,6 @@ function getIntersectionArea(
 	const height = y2 - y1;
 	return width * height;
 }
-
-ipcMain.handle("select-folder", async (): Promise<SelectFolderResult> => {
-	const { canceled, filePaths } = await dialog.showOpenDialog({
-		properties: ["openDirectory"],
-	});
-	if (canceled || filePaths.length === 0) {
-		return { canceled: true };
-	}
-	const folder = filePaths[0];
-	await cacheFiles(folder);
-	await generateResizedCache(300, 300);
-	return { canceled: false, files: await loadCachedImages() };
-});
-
-ipcMain.on(
-	"change-image-size",
-	async (event, size: { width: number; height: number }) => {
-		await generateResizedCache(size.width, size.height);
-		const win = BrowserWindow.fromWebContents(event.sender);
-		if (win) {
-			win.webContents.send("images-ready", await loadCachedImages());
-		}
-	},
-);
-
-ipcMain.on("move-window", (event, delta: { dx: number; dy: number }) => {
-	const win = BrowserWindow.fromWebContents(event.sender);
-	if (win) {
-		const [x, y] = win.getPosition();
-		const newX = x + delta.dx;
-		const newY = y + delta.dy;
-		win.setPosition(newX, newY);
-		setWindowPosition(newX, newY);
-	}
-});
 
 const createWindow = () => {
 	const { width, height } = getWindowSize();
@@ -85,6 +99,9 @@ const createWindow = () => {
 	const browserWindowOptions: Electron.BrowserWindowConstructorOptions = {
 		width,
 		height,
+		resizable: false,
+		maximizable: false,
+		minimizable: true,
 		transparent: true,
 		frame: false,
 		alwaysOnTop: true,

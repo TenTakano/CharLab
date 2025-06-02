@@ -6,6 +6,9 @@ declare global {
 	interface Window {
 		electronAPI: {
 			onImagesReady: (callback: (images: string[]) => void) => void;
+			onWindowSizeChange: (
+				callback: (size: { width: number; height: number }) => void,
+			) => void;
 			selectFolder: () => Promise<SelectFolderResult>;
 			changeImageSize: (size: { width: number; height: number }) => void;
 			moveWindow: (delta: { dx: number; dy: number }) => void;
@@ -17,6 +20,14 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	onImagesReady: (callback: (images: string[]) => void) => {
 		ipcRenderer.on("images-ready", (_event, state) => {
 			callback(state);
+		});
+	},
+
+	onWindowSizeChange: (
+		callback: (size: { width: number; height: number }) => void,
+	) => {
+		ipcRenderer.on("window-size-change", (_event, size) => {
+			callback(size);
 		});
 	},
 
