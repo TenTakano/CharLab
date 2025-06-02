@@ -13,28 +13,42 @@ type ResizeSubmenuProps = {
 
 const ResizeSubmenu: FC<ResizeSubmenuProps> = ({ onResize }) => {
 	const submenuRef = useRef<HTMLDivElement>(null);
-	const [offset, setOffset] = useState<number | string>("100%");
+	const [leftOffset, setLeftOffset] = useState<number | string>("100%");
+	const [topOffset, setTopOffset] = useState<number | string>("100%");
 
 	useLayoutEffect(() => {
 		if (!submenuRef.current || !submenuRef.current.parentElement) return;
 
 		const submenuRect = submenuRef.current.getBoundingClientRect();
 		const parentRect = submenuRef.current.parentElement.getBoundingClientRect();
-		const idealOffset = parentRect.width;
 		const overflowRight = Math.max(
 			0,
-			parentRect.left + idealOffset + submenuRect.width - window.innerWidth,
+			parentRect.left +
+				parentRect.width +
+				submenuRect.width -
+				window.innerWidth,
 		);
-		let newOffset = idealOffset - overflowRight;
-		newOffset = Math.max(newOffset, -parentRect.left);
-		setOffset(newOffset);
+		let newLeftOffset = parentRect.width - overflowRight;
+		newLeftOffset = Math.max(newLeftOffset, -parentRect.left);
+		setLeftOffset(newLeftOffset);
+
+		const overflowBottom = Math.max(
+			0,
+			parentRect.top +
+				parentRect.height +
+				submenuRect.height -
+				window.innerHeight,
+		);
+		let newTopOffset = parentRect.height - overflowBottom;
+		newTopOffset = Math.max(newTopOffset, -parentRect.top);
+		setTopOffset(newTopOffset);
 	}, []);
 
 	return (
 		<div
 			ref={submenuRef}
 			className="absolute top-0 bg-white shadow-lg rounded-md ring-1 ring-black ring-opacity-5 w-40 py-2"
-			style={{ left: offset }}
+			style={{ left: leftOffset, top: topOffset }}
 		>
 			{Object.keys(ImageSizeMap).map((option) => (
 				<button
