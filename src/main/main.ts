@@ -42,6 +42,17 @@ ipcMain.handle("select-folder", async (): Promise<SelectFolderResult> => {
 	return { canceled: false, files: await loadCachedImages() };
 });
 
+ipcMain.on(
+	"change-image-size",
+	async (event, size: { width: number; height: number }) => {
+		await generateResizedCache(size.width, size.height);
+		const win = BrowserWindow.fromWebContents(event.sender);
+		if (win) {
+			win.webContents.send("images-ready", await loadCachedImages());
+		}
+	},
+);
+
 ipcMain.on("move-window", (event, delta: { dx: number; dy: number }) => {
 	const win = BrowserWindow.fromWebContents(event.sender);
 	if (win) {
@@ -97,7 +108,7 @@ app.whenReady().then(async () => {
 	createWindow();
 	const win = BrowserWindow.getAllWindows()[0];
 	win.webContents.once("did-finish-load", async () => {
-		win.webContents.send("cached-images", await loadCachedImages());
+		win.webContents.send("images-ready", await loadCachedImages());
 	});
 });
 

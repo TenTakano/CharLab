@@ -81,7 +81,7 @@ export async function generateResizedCache(
 		);
 		if (files.length === 0) return;
 
-		if (!fsSync.existsSync(resizedCacheDir)) {
+		if (fsSync.existsSync(resizedCacheDir)) {
 			await !fs.rm(resizedCacheDir, { recursive: true, force: true });
 		}
 		await fs.mkdir(resizedCacheDir, { recursive: true });
@@ -89,7 +89,10 @@ export async function generateResizedCache(
 		for (const input of files) {
 			const inputPath = path.join(cacheDir, input);
 			const { name } = path.parse(input);
-			const outputPath = path.join(resizedCacheDir, `${name}.png`);
+			const outputPath = path.join(
+				resizedCacheDir,
+				`${name}-${maxWidth}x${maxHeight}.png`,
+			);
 
 			await sharp(inputPath)
 				.resize({ width: maxWidth, height: maxHeight, fit: "inside" })

@@ -31,11 +31,12 @@ const App: FC = () => {
 
 		if (newImages.length > 0) {
 			setImages(newImages);
+			setIndex(0);
 		}
 	}, []);
 
 	useEffect(() => {
-		window.electronAPI.onInitialState((cachedFiles: string[]) => {
+		window.electronAPI.onImagesReady((cachedFiles: string[]) => {
 			prepareImages(cachedFiles);
 
 			if (!wrapperRef.current || !canvasRef.current) return;
@@ -53,7 +54,9 @@ const App: FC = () => {
 	}, [prepareImages]);
 
 	const handleSizeChange = useCallback(
-		(_size: { width: number; height: number }) => {},
+		(size: { width: number; height: number }) => {
+			window.electronAPI.changeImageSize(size);
+		},
 		[],
 	);
 
