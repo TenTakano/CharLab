@@ -52,6 +52,11 @@ const App: FC = () => {
 		prepareImages(result.files);
 	}, [prepareImages]);
 
+	const handleSizeChange = useCallback(
+		(_size: { width: number; height: number }) => {},
+		[],
+	);
+
 	const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
 		e.preventDefault();
 		setContextMenuPosition({ x: e.clientX, y: e.clientY });
@@ -144,6 +149,7 @@ const App: FC = () => {
 				show={showContextMenu}
 				position={contextMenuPosition}
 				onSelectDirectory={handleSelectFolder}
+				onResize={handleSizeChange}
 				onClose={() => setShowContextMenu(false)}
 			/>
 			<canvas ref={canvasRef} className="w-full h-full block" />

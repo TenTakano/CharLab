@@ -1,9 +1,17 @@
+import { on } from "node:events";
 import { type FC, useEffect, useLayoutEffect, useRef, useState } from "react";
+
+const ImageSizeMap: Record<string, { width: number; height: number }> = {
+	Small: { width: 300, height: 600 },
+	Medium: { width: 400, height: 800 },
+	Large: { width: 500, height: 1000 },
+};
 
 type Props = {
 	show: boolean;
 	position: { x: number; y: number };
 	onSelectDirectory: () => void;
+	onResize: (size: { width: number; height: number }) => void;
 	onClose: () => void;
 };
 
@@ -11,6 +19,7 @@ const ContextMenu: FC<Props> = ({
 	show,
 	position,
 	onSelectDirectory,
+	onResize,
 	onClose,
 }) => {
 	const contextMenuRef = useRef<HTMLDivElement>(null);
@@ -59,6 +68,8 @@ const ContextMenu: FC<Props> = ({
 	};
 
 	const handleResizeOption = (option: string) => {
+		const size = ImageSizeMap[option];
+		onResize(size);
 		closeContextMenu();
 	};
 
@@ -103,7 +114,7 @@ const ContextMenu: FC<Props> = ({
 				</button>
 				{resizeHover && (
 					<div className="absolute left-full top-0 bg-white shadow-lg rounded-md ring-1 ring-black ring-opacity-5 w-40 py-2">
-						{["Small", "Medium", "Large"].map((option) => (
+						{Object.keys(ImageSizeMap).map((option) => (
 							<button
 								key={option}
 								type="button"
