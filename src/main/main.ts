@@ -52,7 +52,9 @@ ipcMain.on(
 		const win = BrowserWindow.fromWebContents(event.sender);
 		if (win) {
 			win.webContents.send("images-ready", await loadCachedImages());
+			win.setResizable(true);
 			win.setSize(size.width, size.height);
+			win.setResizable(false);
 		}
 	},
 );
