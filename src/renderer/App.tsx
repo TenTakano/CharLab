@@ -69,6 +69,14 @@ const App: FC = () => {
 		onMouseUp: onCanvasMouseUp,
 	} = useImageCanvas({ images, index, setIndex });
 
+	// Set initial canvas size based on wrapper dimensions
+	useEffect(() => {
+		if (!wrapperRef.current || !canvasRef.current) return;
+		const { clientWidth, clientHeight } = wrapperRef.current;
+		canvasRef.current.width = clientWidth;
+		canvasRef.current.height = clientHeight;
+	}, [wrapperRef, canvasRef]);
+
 	const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
 		onCanvasMouseDown(e);
 		if (!e.shiftKey) return;
