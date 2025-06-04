@@ -9,6 +9,8 @@ export const useImageCanvas = () => {
 	const [images, setImages] = useState<HTMLImageElement[]>([]);
 	const [index, setIndex] = useState(0);
 
+	const [loading, setLoading] = useState(true);
+
 	// Resizing the canvas when the window size changes
 	useEffect(() => {
 		window.electronAPI.onWindowSizeChange(
@@ -22,6 +24,8 @@ export const useImageCanvas = () => {
 
 	// Image Loading
 	const prepareImages = useCallback((files: string[]) => {
+		setLoading(true);
+
 		const newImages = files
 			.sort((a, b) => a.localeCompare(b))
 			.map((file) => {
@@ -34,6 +38,8 @@ export const useImageCanvas = () => {
 			setImages(newImages);
 			setIndex(0);
 		}
+
+		setLoading(false);
 	}, []);
 
 	useEffect(() => {
@@ -123,6 +129,14 @@ export const useImageCanvas = () => {
 		prepareImages(result.files);
 	}, [prepareImages]);
 
+	const changeSize = useCallback(
+		async (size: { width: number; height: number }) => {
+			setLoading(true);
+			await window.electronAPI.changeImageSize(size);
+		},
+		[],
+	);
+
 	return {
 		wrapperRef,
 		canvasRef,
@@ -130,5 +144,7 @@ export const useImageCanvas = () => {
 		onMouseMove,
 		onMouseUp,
 		loadFolder,
+		changeSize,
+		loading,
 	};
 };

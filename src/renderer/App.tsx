@@ -20,6 +20,8 @@ const App: FC = () => {
 		onMouseMove: onCanvasMouseMove,
 		onMouseUp: onCanvasMouseUp,
 		loadFolder,
+		changeSize: changeImageSize,
+		loading,
 	} = useImageCanvas();
 
 	// Set initial canvas size based on wrapper dimensions
@@ -29,13 +31,6 @@ const App: FC = () => {
 		canvasRef.current.width = clientWidth;
 		canvasRef.current.height = clientHeight;
 	}, [wrapperRef, canvasRef]);
-
-	const handleSizeChange = useCallback(
-		(size: { width: number; height: number }) => {
-			window.electronAPI.changeImageSize(size);
-		},
-		[],
-	);
 
 	const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
 		e.preventDefault();
@@ -86,10 +81,17 @@ const App: FC = () => {
 				onSelectDirectory={async () => {
 					await loadFolder();
 				}}
-				onResize={handleSizeChange}
+				onResize={async (size) => {
+					await changeImageSize(size);
+				}}
 				onClose={() => setShowContextMenu(false)}
 			/>
 			<canvas ref={canvasRef} className="w-full h-full block" />
+			{loading && (
+				<div className="absolute inset-0 z-10 flex items-center justify-center">
+					<div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
+				</div>
+			)}
 		</div>
 	);
 };
