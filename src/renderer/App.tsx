@@ -1,7 +1,7 @@
 import { type FC, useCallback, useEffect, useRef, useState } from "react";
 
-import noImage from "@ui/assets/noimage.svg";
 import ContextMenu from "@ui/components/ContextMenu";
+import { useImageCanvas } from "@ui/hooks/useImageCanvas";
 
 const App: FC = () => {
 	const [showContextMenu, setShowContextMenu] = useState(false);
@@ -12,12 +12,7 @@ const App: FC = () => {
 	const [images, setImages] = useState<HTMLImageElement[]>([]);
 	const [index, setIndex] = useState(0);
 
-	const wrapperRef = useRef<HTMLDivElement>(null);
-	const canvasRef = useRef<HTMLCanvasElement>(null);
-
-	const isRotating = useRef(false);
 	const isMovingWindow = useRef(false);
-	const startX = useRef(0);
 	const lastScreen = useRef({ x: 0, y: 0 });
 
 	const prepareImages = useCallback((files: string[]) => {
@@ -46,16 +41,6 @@ const App: FC = () => {
 		});
 	}, [prepareImages]);
 
-	useEffect(() => {
-		window.electronAPI.onWindowSizeChange(
-			(size: { width: number; height: number }) => {
-				if (!wrapperRef.current || !canvasRef.current) return;
-				canvasRef.current.width = size.width;
-				canvasRef.current.height = size.height;
-			},
-		);
-	}, []);
-
 	const handleSelectFolder = useCallback(async () => {
 		const result = await window.electronAPI.selectFolder();
 		if (result.canceled || !result.files) return;
@@ -76,76 +61,39 @@ const App: FC = () => {
 		setShowContextMenu(true);
 	};
 
-	useEffect(() => {
-		const canvas = canvasRef.current;
-		if (!canvas) return;
-		const ctx = canvas.getContext("2d");
-		if (!ctx) return;
-
-		let img: HTMLImageElement;
-		if (images.length > 0) {
-			img = images[index];
-		} else {
-			img = new Image();
-			img.src = noImage;
-		}
-
-		const drawImage = () => {
-			const imgWidth = img.naturalWidth || img.width;
-			const imgHeight = img.naturalHeight || img.height;
-			const x = (canvas.width - imgWidth) / 2;
-			const y = (canvas.height - imgHeight) / 2;
-			ctx.clearRect(0, 0, canvas.width, canvas.height);
-			ctx.drawImage(img, x, y);
-		};
-
-		if (img.complete) {
-			drawImage();
-		} else {
-			img.onload = drawImage;
-		}
-	}, [images, index]);
+	const {
+		wrapperRef,
+		canvasRef,
+		onMouseDown: onCanvasMouseDown,
+		onMouseMove: onCanvasMouseMove,
+		onMouseUp: onCanvasMouseUp,
+	} = useImageCanvas({ images, index, setIndex });
 
 	const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-		if (e.shiftKey) {
-			isMovingWindow.current = true;
-			lastScreen.current = { x: e.screenX, y: e.screenY };
-			wrapperRef.current!.style.cursor = "move";
-			return;
-		}
+		onCanvasMouseDown(e);
+		if (!e.shiftKey) return;
 
-		if (images.length === 0) return;
-		isRotating.current = true;
-		startX.current = e.clientX;
-		wrapperRef.current!.style.cursor = "grabbing";
+		isMovingWindow.current = true;
+		lastScreen.current = { x: e.screenX, y: e.screenY };
+		wrapperRef.current!.style.cursor = "move";
 	};
 
 	const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-		if (isMovingWindow.current) {
-			const dx = e.screenX - lastScreen.current.x;
-			const dy = e.screenY - lastScreen.current.y;
-			lastScreen.current = { x: e.screenX, y: e.screenY };
-			window.electronAPI.moveWindow({ dx, dy });
-			return;
-		}
+		onCanvasMouseMove(e);
+		if (!isMovingWindow.current) return;
 
-		if (isRotating.current) {
-			const deltaX = e.clientX - startX.current;
-			const step = Math.floor(deltaX / 10);
-			if (step !== 0) {
-				const newIndex = (index + step + images.length) % images.length;
-				setIndex(newIndex);
-				startX.current = e.clientX;
-			}
-		}
+		const dx = e.screenX - lastScreen.current.x;
+		const dy = e.screenY - lastScreen.current.y;
+		lastScreen.current = { x: e.screenX, y: e.screenY };
+		window.electronAPI.moveWindow({ dx, dy });
 	};
 
-	const handleMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
-		if (isMovingWindow.current || isRotating.current) {
-			isMovingWindow.current = false;
-			isRotating.current = false;
-			wrapperRef.current!.style.cursor = "grab";
-		}
+	const handleMouseUp = () => {
+		onCanvasMouseUp();
+		if (!isMovingWindow.current) return;
+
+		isMovingWindow.current = false;
+		wrapperRef.current!.style.cursor = "grab";
 	};
 
 	return (
