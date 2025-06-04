@@ -22,6 +22,14 @@ const App: FC = () => {
 		loadFolder,
 	} = useImageCanvas();
 
+	// Set initial canvas size based on wrapper dimensions
+	useEffect(() => {
+		if (!wrapperRef.current || !canvasRef.current) return;
+		const { clientWidth, clientHeight } = wrapperRef.current;
+		canvasRef.current.width = clientWidth;
+		canvasRef.current.height = clientHeight;
+	}, [wrapperRef, canvasRef]);
+
 	const handleSizeChange = useCallback(
 		(size: { width: number; height: number }) => {
 			window.electronAPI.changeImageSize(size);
@@ -34,14 +42,6 @@ const App: FC = () => {
 		setContextMenuPosition({ x: e.clientX, y: e.clientY });
 		setShowContextMenu(true);
 	};
-
-	// Set initial canvas size based on wrapper dimensions
-	useEffect(() => {
-		if (!wrapperRef.current || !canvasRef.current) return;
-		const { clientWidth, clientHeight } = wrapperRef.current;
-		canvasRef.current.width = clientWidth;
-		canvasRef.current.height = clientHeight;
-	}, [wrapperRef, canvasRef]);
 
 	const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
 		onCanvasMouseDown(e);
