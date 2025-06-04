@@ -1,20 +1,13 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import noImage from "@ui/assets/noimage.svg";
 
-type ImageCanvasParams = {
-	images: HTMLImageElement[];
-	index: number;
-	setIndex: React.Dispatch<React.SetStateAction<number>>;
-};
-
-export const useImageCanvas = ({
-	images,
-	index,
-	setIndex,
-}: ImageCanvasParams) => {
+export const useImageCanvas = () => {
 	const wrapperRef = useRef<HTMLDivElement>(null);
 	const canvasRef = useRef<HTMLCanvasElement>(null);
+
+	const [images, setImages] = useState<HTMLImageElement[]>([]);
+	const [index, setIndex] = useState(0);
 
 	// Resizing the canvas when the window size changes
 	useEffect(() => {
@@ -26,6 +19,33 @@ export const useImageCanvas = ({
 			},
 		);
 	}, []);
+
+	// Image Loading
+	const prepareImages = useCallback((files: string[]) => {
+		const newImages = files
+			.sort((a, b) => a.localeCompare(b))
+			.map((file) => {
+				const img = new Image();
+				img.src = `file://${file}`;
+				return img;
+			});
+
+		if (newImages.length > 0) {
+			setImages(newImages);
+			setIndex(0);
+		}
+	}, []);
+
+	useEffect(() => {
+		window.electronAPI.onImagesReady((cachedFiles: string[]) => {
+			prepareImages(cachedFiles);
+
+			if (!wrapperRef.current || !canvasRef.current) return;
+			const { clientWidth, clientHeight } = wrapperRef.current;
+			canvasRef.current.width = clientWidth;
+			canvasRef.current.height = clientHeight;
+		});
+	}, [prepareImages]);
 
 	// Drawing Logic
 	useEffect(() => {
@@ -87,7 +107,7 @@ export const useImageCanvas = ({
 				startX.current = e.clientX;
 			}
 		},
-		[images, index, setIndex],
+		[images, index],
 	);
 
 	const onMouseUp = useCallback(() => {
@@ -97,11 +117,18 @@ export const useImageCanvas = ({
 		if (wrapperRef.current) wrapperRef.current.style.cursor = "grab";
 	}, []);
 
+	const loadFolder = useCallback(async () => {
+		const result = await window.electronAPI.selectFolder();
+		if (result.canceled || !result.files) return;
+		prepareImages(result.files);
+	}, [prepareImages]);
+
 	return {
 		wrapperRef,
 		canvasRef,
 		onMouseDown,
 		onMouseMove,
 		onMouseUp,
+		loadFolder,
 	};
 };

@@ -9,44 +9,18 @@ const App: FC = () => {
 		x: 0,
 		y: 0,
 	});
-	const [images, setImages] = useState<HTMLImageElement[]>([]);
-	const [index, setIndex] = useState(0);
 
 	const isMovingWindow = useRef(false);
 	const lastScreen = useRef({ x: 0, y: 0 });
 
-	const prepareImages = useCallback((files: string[]) => {
-		const newImages = files
-			.sort((a, b) => a.localeCompare(b))
-			.map((file) => {
-				const img = new Image();
-				img.src = `file://${file}`;
-				return img;
-			});
-
-		if (newImages.length > 0) {
-			setImages(newImages);
-			setIndex(0);
-		}
-	}, []);
-
-	useEffect(() => {
-		window.electronAPI.onImagesReady((cachedFiles: string[]) => {
-			prepareImages(cachedFiles);
-
-			if (!wrapperRef.current || !canvasRef.current) return;
-			const { clientWidth, clientHeight } = wrapperRef.current;
-			canvasRef.current.width = clientWidth;
-			canvasRef.current.height = clientHeight;
-		});
-	}, [prepareImages]);
-
-	const handleSelectFolder = useCallback(async () => {
-		const result = await window.electronAPI.selectFolder();
-		if (result.canceled || !result.files) return;
-
-		prepareImages(result.files);
-	}, [prepareImages]);
+	const {
+		wrapperRef,
+		canvasRef,
+		onMouseDown: onCanvasMouseDown,
+		onMouseMove: onCanvasMouseMove,
+		onMouseUp: onCanvasMouseUp,
+		loadFolder,
+	} = useImageCanvas();
 
 	const handleSizeChange = useCallback(
 		(size: { width: number; height: number }) => {
@@ -60,14 +34,6 @@ const App: FC = () => {
 		setContextMenuPosition({ x: e.clientX, y: e.clientY });
 		setShowContextMenu(true);
 	};
-
-	const {
-		wrapperRef,
-		canvasRef,
-		onMouseDown: onCanvasMouseDown,
-		onMouseMove: onCanvasMouseMove,
-		onMouseUp: onCanvasMouseUp,
-	} = useImageCanvas({ images, index, setIndex });
 
 	// Set initial canvas size based on wrapper dimensions
 	useEffect(() => {
@@ -117,7 +83,9 @@ const App: FC = () => {
 			<ContextMenu
 				show={showContextMenu}
 				position={contextMenuPosition}
-				onSelectDirectory={handleSelectFolder}
+				onSelectDirectory={async () => {
+					await loadFolder();
+				}}
 				onResize={handleSizeChange}
 				onClose={() => setShowContextMenu(false)}
 			/>
