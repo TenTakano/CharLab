@@ -134,21 +134,14 @@ const ContextMenu: FC<Props> = ({
 		onClose();
 	};
 
-	const handleResizeOption = (size: { width: number; height: number }) => {
-		onResize(size);
+	const handleSelectFolder = () => {
+		onSelectDirectory();
 		closeContextMenu();
 	};
 
-	const handleClickMenuButton = (item: string) => {
-		switch (item) {
-			case "Select Folder":
-				onSelectDirectory();
-				closeContextMenu();
-				break;
-			default:
-				// Other menu items are handled separately.
-				break;
-		}
+	const handleResizeOption = (size: { width: number; height: number }) => {
+		onResize(size);
+		closeContextMenu();
 	};
 
 	if (!show) return null;
@@ -158,18 +151,14 @@ const ContextMenu: FC<Props> = ({
 			style={{ left: pos.x, top: pos.y }}
 			ref={contextMenuRef}
 		>
-			<Button onClick={() => handleClickMenuButton("Select Folder")}>
-				Select Folder
-			</Button>
+			<Button onClick={handleSelectFolder}>フォルダを選択</Button>
 
 			<div
 				className="relative"
 				onMouseEnter={() => setResizeHover(true)}
 				onMouseLeave={() => setResizeHover(false)}
 			>
-				<Button onClick={() => handleClickMenuButton("Resize Widget")}>
-					Resize Widget
-				</Button>
+				<Button>サイズ変更</Button>
 				{resizeHover && <ResizeSubmenu onResize={handleResizeOption} />}
 			</div>
 		</div>
