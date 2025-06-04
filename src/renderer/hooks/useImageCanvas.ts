@@ -62,7 +62,6 @@ export const useImageCanvas = ({
 
 	// Mouse Controls
 	const isRotating = useRef(false);
-	const isMovingWindow = useRef(false);
 	const startX = useRef(0);
 
 	const onMouseDown = useCallback(
