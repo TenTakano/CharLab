@@ -96,8 +96,6 @@ const App: FC = () => {
 			const x = (canvas.width - imgWidth) / 2;
 			const y = (canvas.height - imgHeight) / 2;
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
-			ctx.fillStyle = "white";
-			ctx.fillRect(0, 0, canvas.width, canvas.height);
 			ctx.drawImage(img, x, y);
 		};
 
