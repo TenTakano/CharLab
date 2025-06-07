@@ -17,9 +17,9 @@ jobs:
           - os: ubuntu-latest
             build_script: build:linux
             artifact_ext: deb
-          # - os: macos-latest
-          #   build_script: build:mac
-          #   artifact_ext: dmg
+          - os: macos-latest
+            build_script: build:mac
+            artifact_ext: dmg
           - os: windows-latest
             build_script: build:windows
             artifact_ext: exe
