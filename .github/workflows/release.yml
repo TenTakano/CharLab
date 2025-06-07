@@ -16,9 +16,9 @@ jobs:
           # - os: macos-latest
           #   build_script: build:mac
           #   artifact_ext: dmg
-          # - os: windows-latest
-          #   build_script: build:windows
-          #   artifact_ext: exe
+          - os: windows-latest
+            build_script: build:windows
+            artifact_ext: exe
     runs-on: ${{ matrix.os }}
 
     steps:
