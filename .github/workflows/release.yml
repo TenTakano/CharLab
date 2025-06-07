@@ -1,0 +1,70 @@
+name: Build & Release Desktop Packages
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            build_script: build:linux
+            artifact_ext: deb
+          - os: macos-latest
+            build_script: build:mac
+            artifact_ext: dmg
+          - os: windows-latest
+            build_script: build:windows
+            artifact_ext: exe
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: npm ci --include=optional --unsafe-perm
+
+      - name: Build ${{ matrix.os }}
+        run: npm run ${{ matrix.build_script }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: charlab-${{ matrix.os }}
+          path: release/*.${{ matrix.artifact_ext }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          draft: true
+
+      - name: Upload release assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: |
+            artifacts/**/*
+          asset_name: |
+            $(basename ${{ asset }})
+          asset_content_type: application/octet-stream
