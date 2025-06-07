@@ -11,7 +11,7 @@
 		"build:css": "tailwindcss -i ./src/renderer/styles/global.css -o ./src/renderer/styles/tailwind.css --minify",
 		"build:linux": "npm run build:web && electron-builder --linux deb --publish never",
 		"build:mac": "npm run build:web && electron-builder --mac --publish never",
-		"build:win": "npm run build:web && electron-builder --win --publish never",
+		"build:windows": "npm run build:web && electron-builder --win --publish never",
 		"build": "npm run build:web",
 		"start": "npm run build && electron ./dist/main.js",
 		"dist": "electron-builder",
