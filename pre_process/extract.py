@@ -4,67 +4,55 @@ from pathlib import Path
 from rembg import new_session, remove
 from PIL import Image
 
+
 def parse_args():
     p = argparse.ArgumentParser(
         description="Extract the foreground from an image and save it to a new file. Accepts a file or a directory (processes recursively)."
     )
     p.add_argument(
-        "input_file",
-        type=Path,
-        help="Path to the input image file or directory."
+        "input_file", type=Path, help="Path to the input image file or directory."
     )
-    p.add_argument(
-        "output_dir",
-        type=Path,
-        help="Path to the output directory."
-    )
+    p.add_argument("output_dir", type=Path, help="Path to the output directory.")
     p.add_argument(
         "--model",
         default="isnet-anime",
-        help="Model to use for foreground extraction (default: isnet-anime). See rembg documentation for available models. (https://github.com/danielgatis/rembg?tab=readme-ov-file#models)"
+        help="Model to use for foreground extraction (default: isnet-anime). See rembg documentation for available models. (https://github.com/danielgatis/rembg?tab=readme-ov-file#models)",
     )
     p.add_argument(
         "--angle",
         type=float,
         default=-90,
-        help="Angle for image rotation (default: -90)."
+        help="Angle for image rotation (default: -90).",
     )
     return p.parse_args()
+
 
 def extract_foreground(img_bytes, model):
     print(f"Extracting foreground using model: {model}")
     session = new_session(model)
     return remove(img_bytes, session=session)
 
-def trim_and_rotate(image, angle, alpha_threshold=10):
+
+def rotate(image, angle):
     img = Image.open(io.BytesIO(image)).convert("RGBA")
     rotated = img.rotate(angle, expand=True)
 
-    alpha = rotated.getchannel("A")
-    mask = alpha.point(lambda a: 255 if a > alpha_threshold else 0)
-    bbox = mask.getbbox()
-
-    if bbox is None:
-        print("Warning: Could not detect non-transparent area. Cropping will not be applied.")
-        cropped = rotated
-    else:
-        cropped = rotated.crop(bbox)
-        print(f"Image Cropped and Rotated. Original size: {img.size}, New size: {cropped.size}")
-
     with io.BytesIO() as buffer:
-        cropped.save(buffer, format="PNG")
+        rotated.save(buffer, format="PNG")
         return buffer.getvalue()
+
 
 def process_file(file, model, angle):
     try:
         img_bytes = file.read_bytes()
         foreground = extract_foreground(img_bytes, model=model)
-        result = trim_and_rotate(foreground, angle=angle)
+        result = rotate(foreground, angle=angle)
         print(f"Processed {file}: completed processing.")
         return result
     except Exception as e:
         print(f"Failed to process file {file}: {e}")
         return None
+
 
 def main():
     args = parse_args()
@@ -77,13 +65,17 @@ def main():
 
     if output_dir.exists():
         if not output_dir.is_dir():
-            ans = input(f"{output_dir} exists and is not a directory. Do you want to continue? (y/n): ")
-            if ans.lower() != 'n':
+            ans = input(
+                f"{output_dir} exists and is not a directory. Do you want to continue? (y/n): "
+            )
+            if ans.lower() != "n":
                 exit("Aborted by user.")
         else:
             if any(output_dir.iterdir()):
-                ans = input(f"{output_dir} is not empty. Do you want to continue? (y/n): ")
-                if ans.lower() != 'n':
+                ans = input(
+                    f"{output_dir} is not empty. Do you want to continue? (y/n): "
+                )
+                if ans.lower() != "n":
                     exit("Aborted by user.")
 
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -116,6 +108,7 @@ def main():
             print(f"Skipping {file} due to processing error.")
 
     print(f"\nProcessing completed. Success: {success_count}, Failed: {failed_count}")
+
 
 if __name__ == "__main__":
     main()
