@@ -368,6 +368,17 @@ extra = ["lxml (>=4.6)", "pydot (>=3.0.1)", "pygraphviz (>=1.14)", "sympy (>=1.1
 test = ["pytest (>=7.2)", "pytest-cov (>=4.0)"]
 
 [[package]]
+name = "np"
+version = "1.0.2"
+description = "np = numpy++: numpy with added convenience functionality"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "np-1.0.2.tar.gz", hash = "sha256:781265283f3823663ad8fb48741aae62abcf4c78bc19f908f8aa7c1d3eb132f8"},
+]
+
+[[package]]
 name = "numba"
 version = "0.61.2"
 description = "compiling Python code using LLVM"
@@ -1116,4 +1127,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "c21445c60ff637cc43b2db234a35e6178c35be1ac06c3f5627f6c9f07ec12de3"
+content-hash = "e49edf1744c147472fc58648d8a3224b223c31ac0c7c100a8fc77b8771ae0a89"
