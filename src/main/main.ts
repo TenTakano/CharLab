@@ -30,6 +30,9 @@ ipcMain.handle("select-folder", async (): Promise<SelectFolderResult> => {
 	if (canceled || filePaths.length === 0) {
 		return { canceled: true };
 	}
+
+	const win = BrowserWindow.getAllWindows()[0];
+	win.webContents.send("folder-changed");
 	const folder = filePaths[0];
 	await cacheFiles(folder);
 	const { width, height } = getWindowSize();
