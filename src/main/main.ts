@@ -1,5 +1,6 @@
 import * as path from "node:path";
 import type { SelectFolderResult } from "@/common/type";
+import { createSettingsWindow } from "@main/windows/settingsWindow";
 import { BrowserWindow, app, dialog, ipcMain, screen } from "electron";
 import {
 	cacheFiles,
@@ -12,6 +13,8 @@ import {
 	setWindowPosition,
 	setWindowSize,
 } from "./settings";
+
+let settingsWin: BrowserWindow | null = null;
 
 const changeWindowSize = (
 	win: BrowserWindow,
@@ -62,6 +65,18 @@ ipcMain.on("move-window", (event, delta: { dx: number; dy: number }) => {
 		win.setPosition(newX, newY);
 		setWindowPosition(newX, newY);
 	}
+});
+
+ipcMain.on("open-settings-window", () => {
+	const parent = BrowserWindow.getAllWindows()[0];
+	if (!parent) return;
+
+	if (settingsWin && !settingsWin.isDestroyed()) {
+		settingsWin.focus();
+		return;
+	}
+
+	settingsWin = createSettingsWindow(parent);
 });
 
 function getIntersectionArea(

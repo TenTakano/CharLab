@@ -144,6 +144,11 @@ const ContextMenu: FC<Props> = ({
 		closeContextMenu();
 	};
 
+	const handleOpenSettings = () => {
+		window.electronAPI.openSettingsWindow();
+		closeContextMenu();
+	};
+
 	if (!show) return null;
 	return (
 		<div
@@ -161,6 +166,8 @@ const ContextMenu: FC<Props> = ({
 				<Button>サイズ変更</Button>
 				{resizeHover && <ResizeSubmenu onResize={handleResizeOption} />}
 			</div>
+
+			<Button onClick={handleOpenSettings}>設定</Button>
 		</div>
 	);
 };

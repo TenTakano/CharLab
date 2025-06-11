@@ -13,6 +13,7 @@ declare global {
 			selectFolder: () => Promise<SelectFolderResult>;
 			changeImageSize: (size: { width: number; height: number }) => void;
 			moveWindow: (delta: { dx: number; dy: number }) => void;
+			openSettingsWindow: () => void;
 		};
 	}
 }
@@ -47,4 +48,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	moveWindow: (delta: { dx: number; dy: number }) => {
 		ipcRenderer.send("move-window", delta);
 	},
+
+	openSettingsWindow: () => ipcRenderer.send("open-settings-window"),
 });
