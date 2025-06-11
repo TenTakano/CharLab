@@ -31,6 +31,7 @@ export function createSettingsWindow(parent: BrowserWindow): BrowserWindow {
 		},
 	});
 
+	win.removeMenu();
 	win.once("ready-to-show", () => win.show());
 	win.loadFile(path.join(__dirname, "settings.html"));
 	return win;
