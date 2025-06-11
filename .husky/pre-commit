@@ -1,9 +1,9 @@
 stagedFiles=$(git diff --cached --name-only)
 
-npm run format
+pnpm run format
 [ -n "$stagedFiles" ] && git add $stagedFiles
 
-if npm run lint; then
+if pnpm run lint; then
   [ -n "$stagedFiles" ] && git add $stagedFiles
   echo "✅ lint passed, committing…"
   exit 0
