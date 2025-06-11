@@ -20,38 +20,24 @@
 	},
 	"build": {
 		"appId": "com.example.mascot",
-		"files": [
-			"dist/**/*",
-			"assets/**/*",
-			"package.json",
-			"node_modules/**/*"
-		],
+		"files": ["dist/**/*", "assets/**/*", "package.json", "node_modules/**/*"],
 		"directories": {
 			"output": "release"
 		},
-		"npmArgs": [
-			"--omit=dev",
-			"--include=optional"
-		],
+		"npmArgs": ["--omit=dev", "--include=optional"],
 		"asarUnpack": [
 			"node_modules/@img/sharp-*/**/*.node",
 			"node_modules/@img/sharp-libvips-*/lib/**",
 			"node_modules/@img/sharp-linux-*/lib/**"
 		],
 		"mac": {
-			"target": [
-				"dmg"
-			]
+			"target": ["dmg"]
 		},
 		"win": {
-			"target": [
-				"nsis"
-			]
+			"target": ["nsis"]
 		},
 		"linux": {
-			"target": [
-				"deb"
-			]
+			"target": ["deb"]
 		}
 	},
 	"repository": {

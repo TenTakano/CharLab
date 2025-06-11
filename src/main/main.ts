@@ -19,7 +19,6 @@ const changeWindowSize = (
 	win.setResizable(true);
 	win.setSize(size.width, size.height);
 	win.setResizable(false);
-	win.webContents.send("window-size-change", size);
 };
 
 ipcMain.handle("select-folder", async (): Promise<SelectFolderResult> => {
@@ -48,6 +47,7 @@ ipcMain.on(
 		if (win) {
 			win.webContents.send("images-ready", await loadCachedImages());
 			changeWindowSize(win, size);
+			win.webContents.send("window-size-change", size);
 		}
 	},
 );
@@ -77,10 +77,7 @@ ipcMain.on("open-settings-window", () => {
 
 ipcMain.on("set-settings-window-size", (_event, size) => {
 	if (!settingsWin || settingsWin.isDestroyed()) return;
-
-	settingsWin.setResizable(true);
-	settingsWin.setSize(size.width, size.height);
-	settingsWin.setResizable(false);
+	changeWindowSize(settingsWin, size);
 });
 
 app.commandLine.appendSwitch("enable-logging");
