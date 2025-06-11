@@ -20,6 +20,10 @@ export const useImageCanvas = () => {
 				canvasRef.current.height = size.height;
 			},
 		);
+
+		window.electronAPI.onFolderChanged(() => {
+			setLoading(true);
+		});
 	}, []);
 
 	// Image Loading
