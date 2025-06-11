@@ -90,6 +90,33 @@ export const useImageCanvas = () => {
 		}
 	}, [images, index]);
 
+	// Animation Logic
+	const [fps, setFps] = useState(30);
+	const [playing, setPlaying] = useState(true);
+	const [direction, setDirection] = useState(1); // 1 for forward, -1 for backward
+
+	useEffect(() => {
+		if (!playing || images.length === 0) return;
+
+		let frameId: number;
+		let lastFrameTime = performance.now();
+
+		const animate = (time: number) => {
+			const elapsed = time - lastFrameTime;
+			if (elapsed > 1000 / fps) {
+				setIndex((prev) => (prev + direction) % images.length);
+				lastFrameTime = time;
+			}
+			frameId = requestAnimationFrame(animate);
+		};
+
+		frameId = requestAnimationFrame(animate);
+
+		return () => {
+			cancelAnimationFrame(frameId);
+		};
+	}, [playing, images.length, fps, direction]);
+
 	// Mouse Controls
 	const isRotating = useRef(false);
 	const startX = useRef(0);
@@ -147,6 +174,9 @@ export const useImageCanvas = () => {
 		onMouseDown,
 		onMouseMove,
 		onMouseUp,
+		setFps,
+		setPlaying,
+		setDirection,
 		loadFolder,
 		changeSize,
 		loading,
