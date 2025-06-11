@@ -75,6 +75,14 @@ ipcMain.on("open-settings-window", () => {
 	settingsWin = createSettingsWindow(mainWindow);
 });
 
+ipcMain.on("set-settings-window-size", (_event, size) => {
+	if (!settingsWin || settingsWin.isDestroyed()) return;
+
+	settingsWin.setResizable(true);
+	settingsWin.setSize(size.width, size.height);
+	settingsWin.setResizable(false);
+});
+
 app.commandLine.appendSwitch("enable-logging");
 app.whenReady().then(async () => {
 	mainWindow = createMainWindow();

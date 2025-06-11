@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { use, useLayoutEffect, useRef, useState } from "react";
 import { Button, Form } from "react-bootstrap";
 
 enum Direction {
@@ -14,13 +14,26 @@ const App: React.FC = () => {
 	);
 	const [fps, setFps] = useState<number>(30);
 
+	const containerRef = useRef<HTMLDivElement>(null);
+
+	useLayoutEffect(() => {
+		const el = containerRef.current;
+		if (!el) return;
+
+		const rect = el.getBoundingClientRect();
+		window.electronAPI.setSettingsWindowSize({
+			width: Math.ceil(rect.width),
+			height: Math.ceil(rect.height),
+		});
+	}, []);
+
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		// Implement me
 	};
 
 	return (
-		<div>
+		<div ref={containerRef}>
 			<Form onSubmit={handleSubmit}>
 				<Form.Group controlId="size">
 					<h2>表示サイズ(px)</h2>
