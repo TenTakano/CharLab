@@ -1,84 +1,80 @@
-import { Container, Form, Row, Col } from "react-bootstrap";
+import { useState } from "react";
+import { Button, Form } from "react-bootstrap";
+
+enum Direction {
+	Forward = 1,
+	Reverse = -1,
+}
 
 const App: React.FC = () => {
-	const handleSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		console.log("サイズ変更:", e.target.name, e.target.value);
-	};
+	const [width, setWidth] = useState<number>(0);
+	const [height, setHeight] = useState<number>(0);
+	const [playbackDirection, setPlaybackDirection] = useState<Direction>(
+		Direction.Forward,
+	);
+	const [fps, setFps] = useState<number>(30);
 
-	const handleAnimationChange = (
-		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-	) => {
-		console.log("アニメーション設定変更:", e.target.name, e.target.value);
+	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		// Implement me
 	};
 
 	return (
-		<Container>
-			<h1>設定画面</h1>
-			<Form>
-				<fieldset>
-					<legend>表示サイズ(px)</legend>
-					<Row>
-						<Col>
-							<Form.Group controlId="formHeight">
-								<Form.Label>高さ</Form.Label>
-								<Form.Control
-									type="number"
-									name="height"
-									placeholder="高さ"
-									onChange={handleSizeChange}
-								/>
-							</Form.Group>
-						</Col>
-						<Col>
-							<Form.Group controlId="formWidth">
-								<Form.Label>幅</Form.Label>
-								<Form.Control
-									type="number"
-									name="width"
-									placeholder="幅"
-									onChange={handleSizeChange}
-								/>
-							</Form.Group>
-						</Col>
-					</Row>
-				</fieldset>
-				<fieldset className="mt-3">
-					<legend>アニメーション設定</legend>
-					<Form.Group controlId="formPlaybackDirection">
-						<Form.Label>再生方向</Form.Label>
-						<div>
-							<Form.Check
-								inline
-								label="順再生"
-								name="playbackDirection"
-								type="radio"
-								id="forward"
-								value="forward"
-								onChange={handleAnimationChange}
-							/>
-							<Form.Check
-								inline
-								label="逆再生"
-								name="playbackDirection"
-								type="radio"
-								id="reverse"
-								value="reverse"
-								onChange={handleAnimationChange}
-							/>
-						</div>
-					</Form.Group>
-					<Form.Group controlId="formFps" className="mt-2">
-						<Form.Label>再生速度 (fps)</Form.Label>
-						<Form.Control
-							type="number"
-							name="fps"
-							placeholder="fps"
-							onChange={handleAnimationChange}
-						/>
-					</Form.Group>
-				</fieldset>
+		<div>
+			<Form onSubmit={handleSubmit}>
+				<Form.Group controlId="size">
+					<h2>表示サイズ(px)</h2>
+					<Form.Label>高さ</Form.Label>
+					<Form.Control
+						type="number"
+						name="height"
+						value={height}
+						onChange={(e) => setHeight(Number(e.target.value))}
+					/>
+					<Form.Label>幅</Form.Label>
+					<Form.Control
+						type="number"
+						name="width"
+						value={width}
+						onChange={(e) => setWidth(Number(e.target.value))}
+					/>
+				</Form.Group>
+				<Form.Group controlId="animation-direction">
+					<h2>アニメーション設定</h2>
+					<Form.Label>再生方向</Form.Label>
+					<Form.Check
+						inline
+						label="順再生"
+						name="playbackDirection"
+						type="radio"
+						id="forward"
+						checked={playbackDirection === Direction.Forward}
+						onChange={() => setPlaybackDirection(Direction.Forward)}
+					/>
+					<Form.Check
+						inline
+						label="逆再生"
+						name="playbackDirection"
+						type="radio"
+						id="reverse"
+						checked={playbackDirection === Direction.Reverse}
+						onChange={() => setPlaybackDirection(Direction.Reverse)}
+					/>
+				</Form.Group>
+				<Form.Group controlId="animation-speed">
+					<Form.Label>再生速度 (fps)</Form.Label>
+					<Form.Control
+						type="number"
+						name="fps"
+						value={fps}
+						onChange={(e) => setFps(Number(e.target.value))}
+					/>
+				</Form.Group>
+				<Button variant="primary" type="submit">
+					保存
+				</Button>
 			</Form>
-		</Container>
+		</div>
 	);
 };
 
