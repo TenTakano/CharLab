@@ -1,5 +1,7 @@
-import { use, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { Button, Form } from "react-bootstrap";
+
+import style from "./style.module.css";
 
 enum Direction {
 	Forward = 1,
@@ -33,7 +35,7 @@ const App: React.FC = () => {
 	};
 
 	return (
-		<div ref={containerRef}>
+		<div ref={containerRef} className={style.container}>
 			<Form onSubmit={handleSubmit}>
 				<Form.Group controlId="size">
 					<h2>表示サイズ(px)</h2>
