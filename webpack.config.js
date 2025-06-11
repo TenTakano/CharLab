@@ -61,7 +61,7 @@ module.exports = (_env, argv) => {
 			...common,
 			name: "renderer",
 			entry: {
-				renderer: "./src/renderer/index.tsx",
+				renderer: "./src/renderer/apps/MainApp/index.tsx",
 			},
 			target: "electron-renderer",
 			output: {
