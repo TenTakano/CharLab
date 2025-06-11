@@ -9,6 +9,7 @@ import {
 } from "./image_loader";
 import { getWindowSize, setWindowPosition, setWindowSize } from "./settings";
 
+let mainWindow: BrowserWindow | null = null;
 let settingsWin: BrowserWindow | null = null;
 
 const changeWindowSize = (
@@ -63,22 +64,22 @@ ipcMain.on("move-window", (event, delta: { dx: number; dy: number }) => {
 });
 
 ipcMain.on("open-settings-window", () => {
-	const parent = BrowserWindow.getAllWindows()[0];
-	if (!parent) return;
+	if (!mainWindow) return;
 
 	if (settingsWin && !settingsWin.isDestroyed()) {
+		settingsWin.show();
 		settingsWin.focus();
 		return;
 	}
 
-	settingsWin = createSettingsWindow(parent);
+	settingsWin = createSettingsWindow(mainWindow);
 });
 
 app.commandLine.appendSwitch("enable-logging");
 app.whenReady().then(async () => {
-	const win = createMainWindow();
-	win.webContents.once("did-finish-load", async () => {
-		win.webContents.send("images-ready", await loadCachedImages());
+	mainWindow = createMainWindow();
+	mainWindow!.webContents.once("did-finish-load", async () => {
+		mainWindow!.webContents.send("images-ready", await loadCachedImages());
 	});
 });
 
