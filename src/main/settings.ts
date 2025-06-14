@@ -49,7 +49,7 @@ export function setSettings(settings: Partial<Settings>): void {
 		...cache,
 		...settings,
 	};
-	store.set("settings", newSettings);
+	store.set(newSettings);
 	cache = newSettings;
 }
 
