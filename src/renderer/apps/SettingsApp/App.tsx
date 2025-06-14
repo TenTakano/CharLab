@@ -43,7 +43,15 @@ const App: React.FC = () => {
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		// Implement me
+
+		window.electronAPI.setSettings({
+			windowWidth: width,
+			windowHeight: height,
+			playbackDirection: playbackDirection,
+			fps: fps,
+		});
+
+		window.electronAPI.closeSettingsWindow();
 	};
 
 	return (

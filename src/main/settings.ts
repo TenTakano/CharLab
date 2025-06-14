@@ -44,6 +44,15 @@ export function getSettings(): Settings {
 	return { ...cache };
 }
 
+export function setSettings(settings: Partial<Settings>): void {
+	const newSettings: Settings = {
+		...cache,
+		...settings,
+	};
+	store.set("settings", newSettings);
+	cache = newSettings;
+}
+
 export function resetSettings(): void {
 	store.clear();
 

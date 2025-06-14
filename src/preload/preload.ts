@@ -7,6 +7,7 @@ declare global {
 	interface Window {
 		electronAPI: {
 			getSettings: () => Settings;
+			setSettings: (settings: Partial<Settings>) => void;
 			onImagesReady: (callback: (images: string[]) => void) => void;
 			onFolderChanged: (callback: () => void) => void;
 			onWindowSizeChange: (
@@ -18,6 +19,7 @@ declare global {
 
 			// Settings window
 			openSettingsWindow: () => void;
+			closeSettingsWindow: () => void;
 			setSettingsWindowSize: (size: { width: number; height: number }) => void;
 		};
 	}
@@ -25,6 +27,10 @@ declare global {
 
 contextBridge.exposeInMainWorld("electronAPI", {
 	getSettings: () => ipcRenderer.invoke("settings:getAll"),
+
+	setSettings: (settings: Partial<Settings>) => {
+		ipcRenderer.send("settings:set", settings);
+	},
 
 	onImagesReady: (callback: (images: string[]) => void) => {
 		ipcRenderer.on("images-ready", (_event, state) => {
@@ -57,7 +63,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	},
 
 	// Settings window related APIs
-	openSettingsWindow: () => ipcRenderer.send("open-settings-window"),
+	openSettingsWindow: () => ipcRenderer.send("openWindow:settings"),
+
+	closeSettingsWindow: () => ipcRenderer.send("closeWindow:settings"),
 
 	setSettingsWindowSize: (size: { width: number; height: number }) => {
 		ipcRenderer.send("set-settings-window-size", size);
