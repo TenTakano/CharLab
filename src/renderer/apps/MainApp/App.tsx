@@ -1,5 +1,6 @@
 import { type FC, useCallback, useEffect, useRef, useState } from "react";
 
+import type { Settings } from "@main/settings";
 import ContextMenu from "@ui/components/ContextMenu";
 import { useImageCanvas } from "@ui/hooks/useImageCanvas";
 
@@ -23,6 +24,18 @@ const App: FC = () => {
 		changeSize: changeImageSize,
 		loading,
 	} = useImageCanvas();
+
+	useEffect(() => {
+		const unsubscribe = window.electronAPI.onSettingsUpdates(
+			(_settings: Partial<Settings>) => {
+				// Handle settings updates
+			},
+		);
+
+		return () => {
+			unsubscribe();
+		};
+	}, []);
 
 	// Set initial canvas size based on wrapper dimensions
 	useEffect(() => {

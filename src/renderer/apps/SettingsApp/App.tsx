@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Button, Col, Form, Row } from "react-bootstrap";
 
+import type { Settings } from "@main/settings";
 import style from "./style.module.css";
 
 enum Direction {
@@ -16,15 +17,25 @@ const App: React.FC = () => {
 	);
 	const [fps, setFps] = useState<number>(30);
 
+	const [originalWidth, setOriginalWidth] = useState<number>(0);
+	const [originalHeight, setOriginalHeight] = useState<number>(0);
+	const [originalPlaybackDirection, setOriginalPlaybackDirection] =
+		useState<Direction>(Direction.Forward);
+	const [originalFps, setOriginalFps] = useState<number>(30);
+
 	const containerRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		const fetchSettings = async () => {
 			const settings = await window.electronAPI.getSettings();
 			setWidth(settings.windowWidth);
+			setOriginalWidth(settings.windowWidth);
 			setHeight(settings.windowHeight);
+			setOriginalHeight(settings.windowHeight);
 			setPlaybackDirection(settings.playbackDirection);
+			setOriginalPlaybackDirection(settings.playbackDirection);
 			setFps(settings.fps);
+			setOriginalFps(settings.fps);
 		};
 
 		fetchSettings();
@@ -44,13 +55,14 @@ const App: React.FC = () => {
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
-		window.electronAPI.setSettings({
-			windowWidth: width,
-			windowHeight: height,
-			playbackDirection: playbackDirection,
-			fps: fps,
-		});
+		const changes: Partial<Settings> = {};
+		if (width !== originalWidth) changes.windowWidth = width;
+		if (height !== originalHeight) changes.windowHeight = height;
+		if (playbackDirection !== originalPlaybackDirection)
+			changes.playbackDirection = playbackDirection;
+		if (fps !== originalFps) changes.fps = fps;
 
+		window.electronAPI.setSettings(changes);
 		window.electronAPI.closeSettingsWindow();
 	};
 

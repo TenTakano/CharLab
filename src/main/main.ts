@@ -32,6 +32,7 @@ ipcMain.handle("settings:getAll", () => getSettings());
 
 ipcMain.on("settings:set", (_event, settings: Partial<Settings>) => {
 	setSettings(settings);
+	mainWindow?.webContents.send("onSettingsUpdates", settings);
 });
 
 ipcMain.handle("select-folder", async (): Promise<SelectFolderResult> => {

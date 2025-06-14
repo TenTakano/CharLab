@@ -8,6 +8,7 @@ declare global {
 		electronAPI: {
 			getSettings: () => Settings;
 			setSettings: (settings: Partial<Settings>) => void;
+			onSettingsUpdates: (callback: (settings: Settings) => void) => () => void;
 			onImagesReady: (callback: (images: string[]) => void) => void;
 			onFolderChanged: (callback: () => void) => void;
 			onWindowSizeChange: (
@@ -30,6 +31,20 @@ contextBridge.exposeInMainWorld("electronAPI", {
 
 	setSettings: (settings: Partial<Settings>) => {
 		ipcRenderer.send("settings:set", settings);
+	},
+
+	onSettingsUpdates: (callback: (settings: Settings) => void) => {
+		const listener = (
+			_event: Electron.IpcRendererEvent,
+			settings: Settings,
+		) => {
+			callback(settings);
+		};
+		ipcRenderer.on("onSettingsUpdates", listener);
+
+		return () => {
+			ipcRenderer.removeListener("onSettingsUpdates", listener);
+		};
 	},
 
 	onImagesReady: (callback: (images: string[]) => void) => {
