@@ -20,6 +20,8 @@ const App: FC = () => {
 		onMouseDown: onCanvasMouseDown,
 		onMouseMove: onCanvasMouseMove,
 		onMouseUp: onCanvasMouseUp,
+		setFps,
+		setDirection,
 		loadFolder,
 		changeSize: changeImageSize,
 		loading,
@@ -27,15 +29,24 @@ const App: FC = () => {
 
 	useEffect(() => {
 		const unsubscribe = window.electronAPI.onSettingsUpdates(
-			(_settings: Partial<Settings>) => {
-				// Handle settings updates
+			async (settings: Partial<Settings>) => {
+				if (settings.windowSize) {
+					// await changeImageSize(settings.windowSize);
+					// To be implemented: Handle window size changes
+				}
+				if (settings.playbackDirection) {
+					setDirection(settings.playbackDirection);
+				}
+				if (settings.fps) {
+					setFps(settings.fps);
+				}
 			},
 		);
 
 		return () => {
 			unsubscribe();
 		};
-	}, []);
+	}, [setDirection, setFps]);
 
 	// Set initial canvas size based on wrapper dimensions
 	useEffect(() => {

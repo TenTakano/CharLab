@@ -28,10 +28,10 @@ const App: React.FC = () => {
 	useEffect(() => {
 		const fetchSettings = async () => {
 			const settings = await window.electronAPI.getSettings();
-			setWidth(settings.windowWidth);
-			setOriginalWidth(settings.windowWidth);
-			setHeight(settings.windowHeight);
-			setOriginalHeight(settings.windowHeight);
+			setWidth(settings.windowSize.width);
+			setOriginalWidth(settings.windowSize.width);
+			setHeight(settings.windowSize.height);
+			setOriginalHeight(settings.windowSize.height);
 			setPlaybackDirection(settings.playbackDirection);
 			setOriginalPlaybackDirection(settings.playbackDirection);
 			setFps(settings.fps);
@@ -56,8 +56,8 @@ const App: React.FC = () => {
 		e.preventDefault();
 
 		const changes: Partial<Settings> = {};
-		if (width !== originalWidth) changes.windowWidth = width;
-		if (height !== originalHeight) changes.windowHeight = height;
+		if (width !== originalWidth || height !== originalHeight)
+			changes.windowSize = { width, height };
 		if (playbackDirection !== originalPlaybackDirection)
 			changes.playbackDirection = playbackDirection;
 		if (fps !== originalFps) changes.fps = fps;

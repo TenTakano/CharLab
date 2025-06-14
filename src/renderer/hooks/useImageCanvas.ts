@@ -104,7 +104,7 @@ export const useImageCanvas = () => {
 		const animate = (time: number) => {
 			const elapsed = time - lastFrameTime;
 			if (elapsed > 1000 / fps) {
-				setIndex((prev) => (prev + direction) % images.length);
+				setIndex((prev) => (prev + direction + images.length) % images.length);
 				lastFrameTime = time;
 			}
 			frameId = requestAnimationFrame(animate);

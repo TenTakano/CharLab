@@ -2,25 +2,17 @@ import { app } from "electron";
 import Store from "electron-store";
 
 export interface Settings {
-	windowWidth: number;
-	windowHeight: number;
+	windowSize: { width: number; height: number };
+	windowPosition: { x: number; y: number };
 	dirPath: string;
-	windowPosition: {
-		x: number;
-		y: number;
-	};
 	playbackDirection: number; // 1 for forward, -1 for backward
 	fps: number;
 }
 
 const defaults: Settings = {
-	windowWidth: 800,
-	windowHeight: 600,
+	windowSize: { width: 800, height: 600 },
+	windowPosition: { x: 0, y: 0 },
 	dirPath: "",
-	windowPosition: {
-		x: 0,
-		y: 0,
-	},
 	playbackDirection: 1,
 	fps: 30,
 };
@@ -32,10 +24,9 @@ const store = new Store<Settings>({
 });
 
 let cache: Settings = {
-	windowWidth: store.get("windowWidth"),
-	windowHeight: store.get("windowHeight"),
-	dirPath: store.get("dirPath"),
+	windowSize: store.get("windowSize"),
 	windowPosition: store.get("windowPosition"),
+	dirPath: store.get("dirPath"),
 	playbackDirection: store.get("playbackDirection"),
 	fps: store.get("fps"),
 };
@@ -57,10 +48,9 @@ export function resetSettings(): void {
 	store.clear();
 
 	cache = {
-		windowWidth: store.get("windowWidth"),
-		windowHeight: store.get("windowHeight"),
-		dirPath: store.get("dirPath"),
+		windowSize: store.get("windowSize"),
 		windowPosition: store.get("windowPosition"),
+		dirPath: store.get("dirPath"),
 		playbackDirection: store.get("playbackDirection"),
 		fps: store.get("fps"),
 	};
@@ -68,16 +58,14 @@ export function resetSettings(): void {
 
 export function getWindowSize(): { width: number; height: number } {
 	return {
-		width: cache.windowWidth,
-		height: cache.windowHeight,
+		width: cache.windowSize.width,
+		height: cache.windowSize.height,
 	};
 }
 
 export function setWindowSize(width: number, height: number): void {
-	store.set("windowWidth", width);
-	store.set("windowHeight", height);
-	cache.windowWidth = width;
-	cache.windowHeight = height;
+	store.set("windowSize", { width, height });
+	cache.windowSize = { width, height };
 }
 
 export function getWindowPosition(): { x: number; y: number } {
