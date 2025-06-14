@@ -20,38 +20,24 @@
 	},
 	"build": {
 		"appId": "com.example.mascot",
-		"files": [
-			"dist/**/*",
-			"assets/**/*",
-			"package.json",
-			"node_modules/**/*"
-		],
+		"files": ["dist/**/*", "assets/**/*", "package.json", "node_modules/**/*"],
 		"directories": {
 			"output": "release"
 		},
-		"npmArgs": [
-			"--omit=dev",
-			"--include=optional"
-		],
+		"npmArgs": ["--omit=dev", "--include=optional"],
 		"asarUnpack": [
 			"node_modules/@img/sharp-*/**/*.node",
 			"node_modules/@img/sharp-libvips-*/lib/**",
 			"node_modules/@img/sharp-linux-*/lib/**"
 		],
 		"mac": {
-			"target": [
-				"dmg"
-			]
+			"target": ["dmg"]
 		},
 		"win": {
-			"target": [
-				"nsis"
-			]
+			"target": ["nsis"]
 		},
 		"linux": {
-			"target": [
-				"deb"
-			]
+			"target": ["deb"]
 		}
 	},
 	"repository": {
@@ -78,6 +64,7 @@
 		"electron-builder": "^26.0.12",
 		"html-webpack-plugin": "^5.6.3",
 		"husky": "^9.1.7",
+		"mini-css-extract-plugin": "^2.9.2",
 		"style-loader": "^4.0.0",
 		"ts-loader": "^9.5.2",
 		"typescript": "^5.8.3",
@@ -88,6 +75,7 @@
 	"dependencies": {
 		"@tailwindcss/cli": "^4.1.8",
 		"bootstrap": "^5.3.6",
+		"classnames": "^2.5.1",
 		"electron-store": "^10.0.1",
 		"react": "^19.1.0",
 		"react-bootstrap": "^2.10.10",

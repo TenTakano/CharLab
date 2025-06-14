@@ -1,5 +1,6 @@
 const path = require("node:path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = (_env, argv) => {
 	const common = {
@@ -24,9 +25,23 @@ module.exports = (_env, argv) => {
 					},
 				},
 				{
-					test: /\.css$/,
+					test: /\.module\.css$/,
 					use: [
-						"style-loader",
+						MiniCssExtractPlugin.loader,
+						{
+							loader: "css-loader",
+							options: {
+								modules: true,
+								esModule: false,
+							},
+						},
+					],
+				},
+				{
+					test: /\.css$/,
+					exclude: /\.module\.css$/,
+					use: [
+						MiniCssExtractPlugin.loader,
 						{
 							loader: "css-loader",
 							options: { importLoaders: 1 },
@@ -79,6 +94,9 @@ module.exports = (_env, argv) => {
 					template: "./public/settings.html",
 					filename: "settings.html",
 					chunks: ["settings"],
+				}),
+				new MiniCssExtractPlugin({
+					filename: "[name].css",
 				}),
 			],
 		},
