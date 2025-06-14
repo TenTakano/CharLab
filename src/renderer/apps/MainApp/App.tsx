@@ -1,5 +1,6 @@
 import { type FC, useCallback, useEffect, useRef, useState } from "react";
 
+import type { Settings } from "@main/settings";
 import ContextMenu from "@ui/components/ContextMenu";
 import { useImageCanvas } from "@ui/hooks/useImageCanvas";
 
@@ -19,10 +20,33 @@ const App: FC = () => {
 		onMouseDown: onCanvasMouseDown,
 		onMouseMove: onCanvasMouseMove,
 		onMouseUp: onCanvasMouseUp,
+		setFps,
+		setDirection,
 		loadFolder,
 		changeSize: changeImageSize,
 		loading,
 	} = useImageCanvas();
+
+	useEffect(() => {
+		const unsubscribe = window.electronAPI.onSettingsUpdates(
+			async (settings: Partial<Settings>) => {
+				if (settings.windowSize) {
+					// await changeImageSize(settings.windowSize);
+					// To be implemented: Handle window size changes
+				}
+				if (settings.playbackDirection) {
+					setDirection(settings.playbackDirection);
+				}
+				if (settings.fps) {
+					setFps(settings.fps);
+				}
+			},
+		);
+
+		return () => {
+			unsubscribe();
+		};
+	}, [setDirection, setFps]);
 
 	// Set initial canvas size based on wrapper dimensions
 	useEffect(() => {

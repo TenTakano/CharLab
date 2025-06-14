@@ -7,7 +7,14 @@ import {
 	generateResizedCache,
 	loadCachedImages,
 } from "./image_loader";
-import { getWindowSize, setWindowPosition, setWindowSize } from "./settings";
+import {
+	type Settings,
+	getSettings,
+	getWindowSize,
+	setSettings,
+	setWindowPosition,
+	setWindowSize,
+} from "./settings";
 
 let mainWindow: BrowserWindow | null = null;
 let settingsWin: BrowserWindow | null = null;
@@ -20,6 +27,13 @@ const changeWindowSize = (
 	win.setSize(size.width, size.height);
 	win.setResizable(false);
 };
+
+ipcMain.handle("settings:getAll", () => getSettings());
+
+ipcMain.on("settings:set", (_event, settings: Partial<Settings>) => {
+	setSettings(settings);
+	mainWindow?.webContents.send("onSettingsUpdates", settings);
+});
 
 ipcMain.handle("select-folder", async (): Promise<SelectFolderResult> => {
 	const { canceled, filePaths } = await dialog.showOpenDialog({
@@ -63,7 +77,7 @@ ipcMain.on("move-window", (event, delta: { dx: number; dy: number }) => {
 	}
 });
 
-ipcMain.on("open-settings-window", () => {
+ipcMain.on("openWindow:settings", () => {
 	if (!mainWindow) return;
 
 	if (settingsWin && !settingsWin.isDestroyed()) {
@@ -73,6 +87,12 @@ ipcMain.on("open-settings-window", () => {
 	}
 
 	settingsWin = createSettingsWindow(mainWindow);
+});
+
+ipcMain.on("closeWindow:settings", () => {
+	if (settingsWin && !settingsWin.isDestroyed()) {
+		settingsWin.hide();
+	}
 });
 
 ipcMain.on("set-settings-window-size", (_event, size) => {

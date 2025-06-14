@@ -1,7 +1,7 @@
-import classnames from "classnames";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Button, Col, Form, Row } from "react-bootstrap";
 
+import type { Settings } from "@main/settings";
 import style from "./style.module.css";
 
 enum Direction {
@@ -10,14 +10,36 @@ enum Direction {
 }
 
 const App: React.FC = () => {
-	const [width, setWidth] = useState<number>(100);
-	const [height, setHeight] = useState<number>(100);
+	const [width, setWidth] = useState<number>(0);
+	const [height, setHeight] = useState<number>(0);
 	const [playbackDirection, setPlaybackDirection] = useState<Direction>(
 		Direction.Forward,
 	);
 	const [fps, setFps] = useState<number>(30);
 
+	const [originalWidth, setOriginalWidth] = useState<number>(0);
+	const [originalHeight, setOriginalHeight] = useState<number>(0);
+	const [originalPlaybackDirection, setOriginalPlaybackDirection] =
+		useState<Direction>(Direction.Forward);
+	const [originalFps, setOriginalFps] = useState<number>(30);
+
 	const containerRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		const fetchSettings = async () => {
+			const settings = await window.electronAPI.getSettings();
+			setWidth(settings.windowSize.width);
+			setOriginalWidth(settings.windowSize.width);
+			setHeight(settings.windowSize.height);
+			setOriginalHeight(settings.windowSize.height);
+			setPlaybackDirection(settings.playbackDirection);
+			setOriginalPlaybackDirection(settings.playbackDirection);
+			setFps(settings.fps);
+			setOriginalFps(settings.fps);
+		};
+
+		fetchSettings();
+	}, []);
 
 	useLayoutEffect(() => {
 		const el = containerRef.current;
@@ -32,7 +54,16 @@ const App: React.FC = () => {
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		// Implement me
+
+		const changes: Partial<Settings> = {};
+		if (width !== originalWidth || height !== originalHeight)
+			changes.windowSize = { width, height };
+		if (playbackDirection !== originalPlaybackDirection)
+			changes.playbackDirection = playbackDirection;
+		if (fps !== originalFps) changes.fps = fps;
+
+		window.electronAPI.setSettings(changes);
+		window.electronAPI.closeSettingsWindow();
 	};
 
 	return (
