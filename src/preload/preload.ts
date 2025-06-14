@@ -1,10 +1,12 @@
 import { contextBridge, ipcRenderer } from "electron";
 
 import type { SelectFolderResult } from "@/common/type";
+import type { Settings } from "@main/settings";
 
 declare global {
 	interface Window {
 		electronAPI: {
+			getSettings: () => Settings;
 			onImagesReady: (callback: (images: string[]) => void) => void;
 			onFolderChanged: (callback: () => void) => void;
 			onWindowSizeChange: (
@@ -22,6 +24,8 @@ declare global {
 }
 
 contextBridge.exposeInMainWorld("electronAPI", {
+	getSettings: () => ipcRenderer.invoke("settings:getAll"),
+
 	onImagesReady: (callback: (images: string[]) => void) => {
 		ipcRenderer.on("images-ready", (_event, state) => {
 			callback(state);

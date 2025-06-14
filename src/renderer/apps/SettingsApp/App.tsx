@@ -1,5 +1,4 @@
-import classnames from "classnames";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Button, Col, Form, Row } from "react-bootstrap";
 
 import style from "./style.module.css";
@@ -10,14 +9,26 @@ enum Direction {
 }
 
 const App: React.FC = () => {
-	const [width, setWidth] = useState<number>(100);
-	const [height, setHeight] = useState<number>(100);
+	const [width, setWidth] = useState<number>(0);
+	const [height, setHeight] = useState<number>(0);
 	const [playbackDirection, setPlaybackDirection] = useState<Direction>(
 		Direction.Forward,
 	);
 	const [fps, setFps] = useState<number>(30);
 
 	const containerRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		const fetchSettings = async () => {
+			const settings = await window.electronAPI.getSettings();
+			setWidth(settings.windowWidth);
+			setHeight(settings.windowHeight);
+			setPlaybackDirection(settings.playbackDirection);
+			setFps(settings.fps);
+		};
+
+		fetchSettings();
+	}, []);
 
 	useLayoutEffect(() => {
 		const el = containerRef.current;

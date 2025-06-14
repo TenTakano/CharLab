@@ -9,6 +9,8 @@ export interface Settings {
 		x: number;
 		y: number;
 	};
+	playbackDirection: number; // 1 for forward, -1 for backward
+	fps: number;
 }
 
 const defaults: Settings = {
@@ -19,6 +21,8 @@ const defaults: Settings = {
 		x: 0,
 		y: 0,
 	},
+	playbackDirection: 1,
+	fps: 30,
 };
 
 const store = new Store<Settings>({
@@ -32,6 +36,8 @@ let cache: Settings = {
 	windowHeight: store.get("windowHeight"),
 	dirPath: store.get("dirPath"),
 	windowPosition: store.get("windowPosition"),
+	playbackDirection: store.get("playbackDirection"),
+	fps: store.get("fps"),
 };
 
 export function getSettings(): Settings {
@@ -46,6 +52,8 @@ export function resetSettings(): void {
 		windowHeight: store.get("windowHeight"),
 		dirPath: store.get("dirPath"),
 		windowPosition: store.get("windowPosition"),
+		playbackDirection: store.get("playbackDirection"),
+		fps: store.get("fps"),
 	};
 }
 

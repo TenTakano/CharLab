@@ -7,7 +7,12 @@ import {
 	generateResizedCache,
 	loadCachedImages,
 } from "./image_loader";
-import { getWindowSize, setWindowPosition, setWindowSize } from "./settings";
+import {
+	getSettings,
+	getWindowSize,
+	setWindowPosition,
+	setWindowSize,
+} from "./settings";
 
 let mainWindow: BrowserWindow | null = null;
 let settingsWin: BrowserWindow | null = null;
@@ -20,6 +25,8 @@ const changeWindowSize = (
 	win.setSize(size.width, size.height);
 	win.setResizable(false);
 };
+
+ipcMain.handle("settings:getAll", () => getSettings());
 
 ipcMain.handle("select-folder", async (): Promise<SelectFolderResult> => {
 	const { canceled, filePaths } = await dialog.showOpenDialog({
