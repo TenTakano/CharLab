@@ -1,9 +1,18 @@
-import { useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import style from "./style.module.css";
 
 const App: React.FC = () => {
 	const containerRef = useRef<HTMLDivElement>(null);
+
+	const [autoPlayback, setAutoPlayback] = useState(false);
+
+	useEffect(() => {
+		(async () => {
+			const settings = await window.electronAPI.getSettings();
+			setAutoPlayback(settings.autoPlay);
+		})();
+	}, []);
 
 	useLayoutEffect(() => {
 		const el = containerRef.current;
@@ -22,7 +31,8 @@ const App: React.FC = () => {
 	};
 
 	const handleAutoPlay = () => {
-		// To be implemented: Handle auto-play functionality
+		setAutoPlayback(!autoPlayback);
+		window.electronAPI.setSettings({ autoPlay: !autoPlayback });
 		window.electronAPI.closeContextWindow();
 	};
 
