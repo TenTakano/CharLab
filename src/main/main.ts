@@ -1,7 +1,11 @@
+import fs from "node:fs";
+
+import { BrowserWindow, app, dialog, ipcMain } from "electron";
+import { imageSize } from "image-size";
+
 import type { SelectFolderResult } from "@/common/type";
 import { createMainWindow } from "@main/windows/mainWindow";
 import { createSettingsWindow } from "@main/windows/settingsWindow";
-import { BrowserWindow, app, dialog, ipcMain } from "electron";
 import {
 	cacheFiles,
 	generateResizedCache,
@@ -26,6 +30,16 @@ const changeWindowSize = (
 	win.setResizable(true);
 	win.setSize(size.width, size.height);
 	win.setResizable(false);
+};
+
+const updateImageSet = async () => {
+	const images = await loadCachedImages();
+	if (mainWindow && !mainWindow.isDestroyed()) {
+		const buffer = fs.readFileSync(images[0]);
+		const size = imageSize(buffer);
+		changeWindowSize(mainWindow, { width: size.width, height: size.height });
+		mainWindow.webContents.send("images:ready", images);
+	}
 };
 
 ipcMain.handle("settings:getAll", () => getSettings());
@@ -59,7 +73,7 @@ ipcMain.on(
 		setWindowSize(size.width, size.height);
 		const win = BrowserWindow.fromWebContents(event.sender);
 		if (win) {
-			win.webContents.send("images-ready", await loadCachedImages());
+			win.webContents.send("images:ready", await loadCachedImages());
 			changeWindowSize(win, size);
 			win.webContents.send("window-size-change", size);
 		}
@@ -104,7 +118,7 @@ app.commandLine.appendSwitch("enable-logging");
 app.whenReady().then(async () => {
 	mainWindow = createMainWindow();
 	mainWindow!.webContents.once("did-finish-load", async () => {
-		mainWindow!.webContents.send("images-ready", await loadCachedImages());
+		mainWindow!.webContents.send("images:ready", await updateImageSet());
 	});
 });
 

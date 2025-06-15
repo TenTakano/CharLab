@@ -20,6 +20,9 @@ importers:
       electron-store:
         specifier: ^10.0.1
         version: 10.0.1
+      image-size:
+        specifier: ^2.0.2
+        version: 2.0.2
       react:
         specifier: ^19.1.0
         version: 19.1.0
@@ -1834,6 +1837,11 @@ packages:
 
   ieee754@1.2.1:
     resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==}
+
+  image-size@2.0.2:
+    resolution: {integrity: sha512-IRqXKlaXwgSMAMtpNzZa1ZAe8m+Sa1770Dhk8VkSsP9LS+iHD62Zd8FQKs8fbPiagBE7BzoFX23cxFnwshpV6w==}
+    engines: {node: '>=16.x'}
+    hasBin: true
 
   import-local@3.2.0:
     resolution: {integrity: sha512-2SPlun1JUPWoM6t3F0dw0FkCF/jWY8kttcY4f599GLTSjh2OCuuhdTkJQsEcZzBqbXZGKMK2OqW1oZsjtf/gQA==}
@@ -5232,6 +5240,8 @@ snapshots:
       postcss: 8.5.4
 
   ieee754@1.2.1: {}
+
+  image-size@2.0.2: {}
 
   import-local@3.2.0:
     dependencies:
