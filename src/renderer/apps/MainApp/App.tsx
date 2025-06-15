@@ -1,16 +1,9 @@
 import { type FC, useEffect, useRef, useState } from "react";
 
 import type { Settings } from "@main/settings";
-import ContextMenu from "@ui/components/ContextMenu";
 import { useImageCanvas } from "@ui/hooks/useImageCanvas";
 
 const App: FC = () => {
-	const [showContextMenu, setShowContextMenu] = useState(false);
-	const [contextMenuPosition, setContextMenuPosition] = useState({
-		x: 0,
-		y: 0,
-	});
-
 	const isMovingWindow = useRef(false);
 	const lastScreen = useRef({ x: 0, y: 0 });
 
@@ -20,28 +13,9 @@ const App: FC = () => {
 		onMouseDown: onCanvasMouseDown,
 		onMouseMove: onCanvasMouseMove,
 		onMouseUp: onCanvasMouseUp,
-		setFps,
-		setDirection,
 		loadFolder,
 		loading,
 	} = useImageCanvas();
-
-	useEffect(() => {
-		const unsubscribe = window.electronAPI.onSettingsUpdates(
-			async (settings: Partial<Settings>) => {
-				if (settings.playbackDirection) {
-					setDirection(settings.playbackDirection);
-				}
-				if (settings.fps) {
-					setFps(settings.fps);
-				}
-			},
-		);
-
-		return () => {
-			unsubscribe();
-		};
-	}, [setDirection, setFps]);
 
 	// Set initial canvas size based on wrapper dimensions
 	useEffect(() => {

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import type { Settings } from "@main/settings";
 import noImage from "@ui/assets/noimage.svg";
 
 export const useImageCanvas = () => {
@@ -84,7 +85,7 @@ export const useImageCanvas = () => {
 
 	// Animation Logic
 	const [fps, setFps] = useState(30);
-	const [playing, setPlaying] = useState(true);
+	const [playing, setPlaying] = useState(false);
 	const [direction, setDirection] = useState(1); // 1 for forward, -1 for backward
 
 	useEffect(() => {
@@ -108,6 +109,31 @@ export const useImageCanvas = () => {
 			cancelAnimationFrame(frameId);
 		};
 	}, [playing, images.length, fps, direction]);
+
+	// Settings Loading
+	useEffect(() => {
+		const applySettings = (settings: Partial<Settings>) => {
+			if (settings.autoPlay !== undefined) {
+				setPlaying(settings.autoPlay);
+			}
+			if (settings.playbackDirection) {
+				setDirection(settings.playbackDirection);
+			}
+			if (settings.fps) {
+				setFps(settings.fps);
+			}
+		};
+		(async () => {
+			const settings = await window.electronAPI.getSettings();
+			applySettings(settings);
+		})();
+
+		const unsubscribe = window.electronAPI.onSettingsUpdates(applySettings);
+
+		return () => {
+			unsubscribe();
+		};
+	}, []);
 
 	// Mouse Controls
 	const isRotating = useRef(false);
@@ -158,9 +184,6 @@ export const useImageCanvas = () => {
 		onMouseDown,
 		onMouseMove,
 		onMouseUp,
-		setFps,
-		setPlaying,
-		setDirection,
 		loadFolder,
 		loading,
 	};

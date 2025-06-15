@@ -15,7 +15,7 @@ declare global {
 				height: number;
 			}) => void;
 
-			// main window
+			// Main window
 			onImagesReady: (callback: (images: string[]) => void) => () => void;
 			onFolderChanged: (callback: () => void) => void;
 			selectFolder: () => Promise<SelectFolderResult>;
@@ -34,6 +34,7 @@ declare global {
 }
 
 contextBridge.exposeInMainWorld("electronAPI", {
+	// Common
 	getSettings: () => ipcRenderer.invoke("settings:getAll"),
 
 	setSettings: (settings: Partial<Settings>) => {
@@ -58,6 +59,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 		ipcRenderer.send("syncWindowSizeToComponent", size);
 	},
 
+	// Main window
 	onImagesReady: (callback: (images: string[]) => void) => {
 		const listener = (_event: Electron.IpcRendererEvent, images: string[]) => {
 			callback(images);

@@ -5,6 +5,7 @@ export interface Settings {
 	windowSize: { width: number; height: number };
 	windowPosition: { x: number; y: number };
 	dirPath: string;
+	autoPlay: boolean;
 	playbackDirection: number; // 1 for forward, -1 for backward
 	fps: number;
 }
@@ -13,6 +14,7 @@ const defaults: Settings = {
 	windowSize: { width: 800, height: 600 },
 	windowPosition: { x: 0, y: 0 },
 	dirPath: "",
+	autoPlay: false,
 	playbackDirection: 1,
 	fps: 30,
 };
@@ -27,6 +29,7 @@ let cache: Settings = {
 	windowSize: store.get("windowSize"),
 	windowPosition: store.get("windowPosition"),
 	dirPath: store.get("dirPath"),
+	autoPlay: store.get("autoPlay"),
 	playbackDirection: store.get("playbackDirection"),
 	fps: store.get("fps"),
 };
@@ -51,6 +54,7 @@ export function resetSettings(): void {
 		windowSize: store.get("windowSize"),
 		windowPosition: store.get("windowPosition"),
 		dirPath: store.get("dirPath"),
+		autoPlay: store.get("autoPlay"),
 		playbackDirection: store.get("playbackDirection"),
 		fps: store.get("fps"),
 	};

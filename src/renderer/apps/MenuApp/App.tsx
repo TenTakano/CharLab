@@ -1,9 +1,18 @@
-import { useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import style from "./style.module.css";
 
 const App: React.FC = () => {
 	const containerRef = useRef<HTMLDivElement>(null);
+
+	const [autoPlayback, setAutoPlayback] = useState(false);
+
+	useEffect(() => {
+		(async () => {
+			const settings = await window.electronAPI.getSettings();
+			setAutoPlayback(settings.autoPlay);
+		})();
+	}, []);
 
 	useLayoutEffect(() => {
 		const el = containerRef.current;
@@ -22,7 +31,8 @@ const App: React.FC = () => {
 	};
 
 	const handleAutoPlay = () => {
-		// To be implemented: Handle auto-play functionality
+		setAutoPlayback(!autoPlayback);
+		window.electronAPI.setSettings({ autoPlay: !autoPlayback });
 		window.electronAPI.closeContextWindow();
 	};
 
@@ -37,7 +47,7 @@ const App: React.FC = () => {
 				フォルダを選択
 			</button>
 			<button type="button" onClick={handleAutoPlay}>
-				自動再生する
+				{autoPlayback ? "自動再生を停止する" : "自動再生する"}
 			</button>
 			<button type="button" onClick={handleSettings}>
 				設定
