@@ -19,6 +19,8 @@ export function createContextWindow(
 		frame: false,
 		skipTaskbar: true,
 		modal: true,
+		backgroundColor: "#00000000", // Transparent background
+		transparent: true,
 		webPreferences: {
 			nodeIntegration: false,
 			contextIsolation: true,

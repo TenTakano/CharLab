@@ -1,5 +1,7 @@
 import { useLayoutEffect, useRef } from "react";
 
+import style from "./style.module.css";
+
 const App: React.FC = () => {
 	const containerRef = useRef<HTMLDivElement>(null);
 
@@ -14,7 +16,13 @@ const App: React.FC = () => {
 		});
 	}, []);
 
-	return <div ref={containerRef}>Implement me</div>;
+	return (
+		<div ref={containerRef} className={style.container}>
+			<button type="button">フォルダを選択</button>
+			<button type="button">自動再生する</button>
+			<button type="button">設定</button>
+		</div>
+	);
 };
 
 export default App;
