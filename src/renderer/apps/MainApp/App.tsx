@@ -23,7 +23,6 @@ const App: FC = () => {
 		setFps,
 		setDirection,
 		loadFolder,
-		changeSize: changeImageSize,
 		loading,
 	} = useImageCanvas();
 
@@ -104,9 +103,6 @@ const App: FC = () => {
 				position={contextMenuPosition}
 				onSelectDirectory={async () => {
 					await loadFolder();
-				}}
-				onResize={async (size) => {
-					await changeImageSize(size);
 				}}
 				onClose={() => setShowContextMenu(false)}
 			/>

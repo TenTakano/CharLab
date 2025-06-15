@@ -16,69 +16,10 @@ const Button: FC<React.ButtonHTMLAttributes<HTMLButtonElement>> = ({
 	);
 };
 
-const ImageSizeMap: Record<string, { width: number; height: number }> = {
-	Small: { width: 300, height: 600 },
-	Medium: { width: 400, height: 800 },
-	Large: { width: 500, height: 1000 },
-};
-
-type ResizeSubmenuProps = {
-	onResize: (size: { width: number; height: number }) => void;
-};
-
-const ResizeSubmenu: FC<ResizeSubmenuProps> = ({ onResize }) => {
-	const submenuRef = useRef<HTMLDivElement>(null);
-	const [leftOffset, setLeftOffset] = useState<number | string>("100%");
-	const [topOffset, setTopOffset] = useState<number | string>("100%");
-
-	useLayoutEffect(() => {
-		if (!submenuRef.current || !submenuRef.current.parentElement) return;
-
-		const submenuRect = submenuRef.current.getBoundingClientRect();
-		const parentRect = submenuRef.current.parentElement.getBoundingClientRect();
-		const overflowRight = Math.max(
-			0,
-			parentRect.left +
-				parentRect.width +
-				submenuRect.width -
-				window.innerWidth,
-		);
-		let newLeftOffset = parentRect.width - overflowRight;
-		newLeftOffset = Math.max(newLeftOffset, -parentRect.left);
-		setLeftOffset(newLeftOffset);
-
-		const overflowBottom = Math.max(
-			0,
-			parentRect.top +
-				parentRect.height +
-				submenuRect.height -
-				window.innerHeight,
-		);
-		let newTopOffset = parentRect.height - overflowBottom;
-		newTopOffset = Math.max(newTopOffset, -parentRect.top);
-		setTopOffset(newTopOffset);
-	}, []);
-
-	return (
-		<div
-			ref={submenuRef}
-			className="absolute top-0 bg-white shadow-lg rounded-md ring-1 ring-black ring-opacity-5 w-40 py-2"
-			style={{ left: leftOffset, top: topOffset }}
-		>
-			{Object.keys(ImageSizeMap).map((option) => (
-				<Button key={option} onClick={() => onResize(ImageSizeMap[option])}>
-					{`${option}(${ImageSizeMap[option].width}x${ImageSizeMap[option].height})`}
-				</Button>
-			))}
-		</div>
-	);
-};
-
 type Props = {
 	show: boolean;
 	position: { x: number; y: number };
 	onSelectDirectory: () => void;
-	onResize: (size: { width: number; height: number }) => void;
 	onClose: () => void;
 };
 
@@ -86,7 +27,6 @@ const ContextMenu: FC<Props> = ({
 	show,
 	position,
 	onSelectDirectory,
-	onResize,
 	onClose,
 }) => {
 	const contextMenuRef = useRef<HTMLDivElement>(null);
@@ -139,11 +79,6 @@ const ContextMenu: FC<Props> = ({
 		closeContextMenu();
 	};
 
-	const handleResizeOption = (size: { width: number; height: number }) => {
-		onResize(size);
-		closeContextMenu();
-	};
-
 	const handleOpenSettings = () => {
 		window.electronAPI.openSettingsWindow();
 		closeContextMenu();
@@ -157,16 +92,6 @@ const ContextMenu: FC<Props> = ({
 			ref={contextMenuRef}
 		>
 			<Button onClick={handleSelectFolder}>フォルダを選択</Button>
-
-			<div
-				className="relative"
-				onMouseEnter={() => setResizeHover(true)}
-				onMouseLeave={() => setResizeHover(false)}
-			>
-				<Button>サイズ変更</Button>
-				{resizeHover && <ResizeSubmenu onResize={handleResizeOption} />}
-			</div>
-
 			<Button onClick={handleOpenSettings}>設定</Button>
 		</div>
 	);
