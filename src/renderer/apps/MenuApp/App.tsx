@@ -17,15 +17,18 @@ const App: React.FC = () => {
 	}, []);
 
 	const handleSelectFolder = () => {
-		console.log("フォルダを選択");
+		// To be implemented: Handle folder selection
+		window.electronAPI.closeContextWindow();
 	};
 
 	const handleAutoPlay = () => {
-		console.log("自動再生する");
+		// To be implemented: Handle auto-play functionality
+		window.electronAPI.closeContextWindow();
 	};
 
 	const handleSettings = () => {
-		console.log("設定");
+		window.electronAPI.openSettingsWindow();
+		window.electronAPI.closeContextWindow();
 	};
 
 	return (
