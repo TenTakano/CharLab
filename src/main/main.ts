@@ -51,7 +51,7 @@ ipcMain.on("settings:set", (_event, settings: Partial<Settings>) => {
 });
 
 ipcMain.on(
-	"syncWindowToComponent",
+	"syncWindowSizeToComponent",
 	(event, size: { width: number; height: number }) => {
 		if (!mainWindow || mainWindow.isDestroyed()) return;
 
@@ -100,13 +100,20 @@ ipcMain.on(
 	(_event, cursorPosition: { x: number; y: number }) => {
 		if (!mainWindow) return;
 
+		const winPos = mainWindow.getPosition();
+		const globalPosition = {
+			x: cursorPosition.x + winPos[0],
+			y: cursorPosition.y + winPos[1],
+		};
+
 		if (contextWindow && !contextWindow.isDestroyed()) {
+			changeWindowPosition(contextWindow, globalPosition);
 			contextWindow.show();
 			contextWindow.focus();
 			return;
 		}
 
-		contextWindow = createContextWindow(mainWindow, cursorPosition);
+		contextWindow = createContextWindow(mainWindow, globalPosition);
 	},
 );
 

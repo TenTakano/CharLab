@@ -10,7 +10,10 @@ declare global {
 			getSettings: () => Settings;
 			setSettings: (settings: Partial<Settings>) => void;
 			onSettingsUpdates: (callback: (settings: Settings) => void) => () => void;
-			syncWindowToComponent: (size: { width: number; height: number }) => void;
+			syncWindowSizeToComponent: (size: {
+				width: number;
+				height: number;
+			}) => void;
 
 			// main window
 			onImagesReady: (callback: (images: string[]) => void) => () => void;
@@ -51,8 +54,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
 		};
 	},
 
-	syncWindowToComponent: (size: { width: number; height: number }) => {
-		ipcRenderer.send("syncWindowToComponent", size);
+	syncWindowSizeToComponent: (size: { width: number; height: number }) => {
+		ipcRenderer.send("syncWindowSizeToComponent", size);
 	},
 
 	onImagesReady: (callback: (images: string[]) => void) => {

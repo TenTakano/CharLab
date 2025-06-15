@@ -8,7 +8,7 @@ const App: React.FC = () => {
 		if (!el) return;
 
 		const rect = el.getBoundingClientRect();
-		window.electronAPI.syncWindowToComponent({
+		window.electronAPI.syncWindowSizeToComponent({
 			width: rect.width,
 			height: rect.height,
 		});

@@ -5,22 +5,12 @@ export function createContextWindow(
 	parent: BrowserWindow,
 	cursorPosition: { x: number; y: number },
 ): BrowserWindow {
-	const sw = 400;
-	const sh = 300;
-
-	let xx = cursorPosition.x;
-	let yy = cursorPosition.y;
-
-	const wa = screen.getDisplayMatching(parent.getBounds()).workArea;
-	xx = Math.min(Math.max(xx, wa.x), wa.x + wa.width - sw);
-	yy = Math.min(Math.max(yy, wa.y), wa.y + wa.height - sh);
-
 	const win = new BrowserWindow({
 		parent,
-		width: sw,
-		height: sh,
-		x: xx,
-		y: yy,
+		width: 400, // Temporary width, should be adjusted later
+		height: 300, // Temporary height, should be adjusted later
+		x: cursorPosition.x,
+		y: cursorPosition.y,
 		resizable: false,
 		maximizable: false,
 		minimizable: false,
