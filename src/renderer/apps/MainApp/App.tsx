@@ -1,6 +1,5 @@
 import { type FC, useEffect, useRef, useState } from "react";
 
-import type { Settings } from "@main/settings";
 import { useImageCanvas } from "@ui/hooks/useImageCanvas";
 
 const App: FC = () => {

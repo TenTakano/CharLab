@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { Settings } from "@main/settings";
 import noImage from "@ui/assets/noimage.svg";
+import { useSettingsSync } from "@ui/hooks/useSettingsSync";
 
 export const useImageCanvas = () => {
 	const wrapperRef = useRef<HTMLDivElement>(null);
@@ -111,29 +112,17 @@ export const useImageCanvas = () => {
 	}, [playing, images.length, fps, direction]);
 
 	// Settings Loading
-	useEffect(() => {
-		const applySettings = (settings: Partial<Settings>) => {
-			if (settings.autoPlay !== undefined) {
-				setPlaying(settings.autoPlay);
-			}
-			if (settings.playbackDirection) {
-				setDirection(settings.playbackDirection);
-			}
-			if (settings.fps) {
-				setFps(settings.fps);
-			}
-		};
-		(async () => {
-			const settings = await window.electronAPI.getSettings();
-			applySettings(settings);
-		})();
-
-		const unsubscribe = window.electronAPI.onSettingsUpdates(applySettings);
-
-		return () => {
-			unsubscribe();
-		};
-	}, []);
+	useSettingsSync((settings: Partial<Settings>) => {
+		if (settings.autoPlay !== undefined) {
+			setPlaying(settings.autoPlay);
+		}
+		if (settings.playbackDirection) {
+			setDirection(settings.playbackDirection);
+		}
+		if (settings.fps) {
+			setFps(settings.fps);
+		}
+	});
 
 	// Mouse Controls
 	const isRotating = useRef(false);
