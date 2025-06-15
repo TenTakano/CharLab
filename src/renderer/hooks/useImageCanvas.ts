@@ -110,21 +110,26 @@ export const useImageCanvas = () => {
 		};
 	}, [playing, images.length, fps, direction]);
 
-	// Settings Updates
+	// Settings Loading
 	useEffect(() => {
-		const unsubscribe = window.electronAPI.onSettingsUpdates(
-			async (settings: Partial<Settings>) => {
-				if (settings.autoPlay !== undefined) {
-					setPlaying(settings.autoPlay);
-				}
-				if (settings.playbackDirection) {
-					setDirection(settings.playbackDirection);
-				}
-				if (settings.fps) {
-					setFps(settings.fps);
-				}
-			},
-		);
+		const applySettings = (settings: Partial<Settings>) => {
+			if (settings.autoPlay !== undefined) {
+				setPlaying(settings.autoPlay);
+			}
+			if (settings.playbackDirection) {
+				setDirection(settings.playbackDirection);
+			}
+			if (settings.fps) {
+				setFps(settings.fps);
+			}
+		};
+		(async () => {
+			const settings = await window.electronAPI.getSettings();
+			applySettings(settings);
+		})();
+
+		const unsubscribe = window.electronAPI.onSettingsUpdates(applySettings);
+
 		return () => {
 			unsubscribe();
 		};
