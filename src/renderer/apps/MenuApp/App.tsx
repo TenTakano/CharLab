@@ -1,5 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
+import type { Settings } from "@main/settings";
+import { useSettingsSync } from "@ui/hooks/useSettingsSync";
 import style from "./style.module.css";
 
 const App: React.FC = () => {
@@ -7,12 +9,11 @@ const App: React.FC = () => {
 
 	const [autoPlayback, setAutoPlayback] = useState(false);
 
-	useEffect(() => {
-		(async () => {
-			const settings = await window.electronAPI.getSettings();
+	useSettingsSync((settings: Partial<Settings>) => {
+		if (settings.autoPlay !== undefined) {
 			setAutoPlayback(settings.autoPlay);
-		})();
-	}, []);
+		}
+	});
 
 	useLayoutEffect(() => {
 		const el = containerRef.current;
