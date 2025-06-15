@@ -18,7 +18,6 @@ export function createContextWindow(
 		show: false,
 		frame: false,
 		skipTaskbar: true,
-		modal: true,
 		backgroundColor: "#00000000", // Transparent background
 		transparent: true,
 		webPreferences: {

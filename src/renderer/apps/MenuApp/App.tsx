@@ -16,11 +16,29 @@ const App: React.FC = () => {
 		});
 	}, []);
 
+	const handleSelectFolder = () => {
+		console.log("フォルダを選択");
+	};
+
+	const handleAutoPlay = () => {
+		console.log("自動再生する");
+	};
+
+	const handleSettings = () => {
+		console.log("設定");
+	};
+
 	return (
 		<div ref={containerRef} className={style.container}>
-			<button type="button">フォルダを選択</button>
-			<button type="button">自動再生する</button>
-			<button type="button">設定</button>
+			<button type="button" onClick={handleSelectFolder}>
+				フォルダを選択
+			</button>
+			<button type="button" onClick={handleAutoPlay}>
+				自動再生する
+			</button>
+			<button type="button" onClick={handleSettings}>
+				設定
+			</button>
 		</div>
 	);
 };
