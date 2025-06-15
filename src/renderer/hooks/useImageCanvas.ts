@@ -85,7 +85,7 @@ export const useImageCanvas = () => {
 
 	// Animation Logic
 	const [fps, setFps] = useState(30);
-	const [playing, setPlaying] = useState(true);
+	const [playing, setPlaying] = useState(false);
 	const [direction, setDirection] = useState(1); // 1 for forward, -1 for backward
 
 	useEffect(() => {
