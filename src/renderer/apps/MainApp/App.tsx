@@ -1,16 +1,9 @@
 import { type FC, useEffect, useRef, useState } from "react";
 
 import type { Settings } from "@main/settings";
-import ContextMenu from "@ui/components/ContextMenu";
 import { useImageCanvas } from "@ui/hooks/useImageCanvas";
 
 const App: FC = () => {
-	const [showContextMenu, setShowContextMenu] = useState(false);
-	const [contextMenuPosition, setContextMenuPosition] = useState({
-		x: 0,
-		y: 0,
-	});
-
 	const isMovingWindow = useRef(false);
 	const lastScreen = useRef({ x: 0, y: 0 });
 
