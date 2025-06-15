@@ -88,7 +88,7 @@ ipcMain.on("move-window", (event, delta: { dx: number; dy: number }) => {
 
 ipcMain.on(
 	"openWindow:context",
-	(event, cursorPosition: { x: number; y: number }) => {
+	(_event, cursorPosition: { x: number; y: number }) => {
 		if (!mainWindow) return;
 
 		if (contextWindow && !contextWindow.isDestroyed()) {
