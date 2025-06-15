@@ -17,6 +17,10 @@ declare global {
 			selectFolder: () => Promise<SelectFolderResult>;
 			moveWindow: (delta: { dx: number; dy: number }) => void;
 
+			// Context window
+			openContextWindow: (cursorPosition: { x: number; y: number }) => void;
+			closeContextWindow: () => void;
+
 			// Settings window
 			openSettingsWindow: () => void;
 			closeSettingsWindow: () => void;
@@ -68,6 +72,12 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	moveWindow: (delta: { dx: number; dy: number }) => {
 		ipcRenderer.send("move-window", delta);
 	},
+
+	// Context window related APIs
+	openContextWindow: (cursorPosition: { x: number; y: number }) =>
+		ipcRenderer.send("openWindow:context", cursorPosition),
+
+	closeContextWindow: () => ipcRenderer.send("closeWindow:context"),
 
 	// Settings window related APIs
 	openSettingsWindow: () => ipcRenderer.send("openWindow:settings"),

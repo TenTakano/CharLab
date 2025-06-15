@@ -4,6 +4,7 @@ import { BrowserWindow, app, dialog, ipcMain } from "electron";
 import { imageSize } from "image-size";
 
 import type { SelectFolderResult } from "@/common/type";
+import { createContextWindow } from "@main/windows/contextWindow";
 import { createMainWindow } from "@main/windows/mainWindow";
 import { createSettingsWindow } from "@main/windows/settingsWindow";
 import {
@@ -21,7 +22,8 @@ import {
 } from "./settings";
 
 let mainWindow: BrowserWindow | null = null;
-let settingsWin: BrowserWindow | null = null;
+let contextWindow: BrowserWindow | null = null;
+let settingsWindow: BrowserWindow | null = null;
 
 const changeWindowSize = (
 	win: BrowserWindow,
@@ -84,27 +86,48 @@ ipcMain.on("move-window", (event, delta: { dx: number; dy: number }) => {
 	}
 });
 
+ipcMain.on(
+	"openWindow:context",
+	(event, cursorPosition: { x: number; y: number }) => {
+		if (!mainWindow) return;
+
+		if (contextWindow && !contextWindow.isDestroyed()) {
+			contextWindow.show();
+			contextWindow.focus();
+			return;
+		}
+
+		contextWindow = createContextWindow(mainWindow, cursorPosition);
+	},
+);
+
+ipcMain.on("closeWindow:context", () => {
+	if (contextWindow && !contextWindow.isDestroyed()) {
+		contextWindow.hide();
+	}
+});
+
 ipcMain.on("openWindow:settings", () => {
 	if (!mainWindow) return;
 
-	if (settingsWin && !settingsWin.isDestroyed()) {
-		settingsWin.show();
-		settingsWin.focus();
+	if (settingsWindow && !settingsWindow.isDestroyed()) {
+		settingsWindow.show();
+		settingsWindow.focus();
 		return;
 	}
 
-	settingsWin = createSettingsWindow(mainWindow);
+	settingsWindow = createSettingsWindow(mainWindow);
 });
 
 ipcMain.on("closeWindow:settings", () => {
-	if (settingsWin && !settingsWin.isDestroyed()) {
-		settingsWin.hide();
+	if (settingsWindow && !settingsWindow.isDestroyed()) {
+		settingsWindow.hide();
 	}
 });
 
 ipcMain.on("set-settings-window-size", (_event, size) => {
-	if (!settingsWin || settingsWin.isDestroyed()) return;
-	changeWindowSize(settingsWin, size);
+	if (!settingsWindow || settingsWindow.isDestroyed()) return;
+	changeWindowSize(settingsWindow, size);
 });
 
 app.commandLine.appendSwitch("enable-logging");
