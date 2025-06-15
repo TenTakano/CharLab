@@ -7,6 +7,7 @@ import type { SelectFolderResult } from "@/common/type";
 import { createContextWindow } from "@main/windows/contextWindow";
 import { createMainWindow } from "@main/windows/mainWindow";
 import { createSettingsWindow } from "@main/windows/settingsWindow";
+import { changeWindowPosition, changeWindowSize } from "@main/windows/utils";
 import {
 	cacheFiles,
 	generateResizedCache,
@@ -24,15 +25,6 @@ import {
 let mainWindow: BrowserWindow | null = null;
 let contextWindow: BrowserWindow | null = null;
 let settingsWindow: BrowserWindow | null = null;
-
-const changeWindowSize = (
-	win: BrowserWindow,
-	size: { width: number; height: number },
-) => {
-	win.setResizable(true);
-	win.setSize(size.width, size.height);
-	win.setResizable(false);
-};
 
 const updateImageSet = async () => {
 	const images = await loadCachedImages();
@@ -57,6 +49,23 @@ ipcMain.on("settings:set", (_event, settings: Partial<Settings>) => {
 	}
 	mainWindow?.webContents.send("onSettingsUpdates", settings);
 });
+
+ipcMain.on(
+	"syncWindowToComponent",
+	(event, size: { width: number; height: number }) => {
+		if (!mainWindow || mainWindow.isDestroyed()) return;
+
+		const senderWin = BrowserWindow.fromWebContents(event.sender);
+		if (senderWin) {
+			changeWindowSize(senderWin, size);
+			const currentPosition = senderWin.getPosition();
+			changeWindowPosition(senderWin, {
+				x: currentPosition[0],
+				y: currentPosition[1],
+			});
+		}
+	},
+);
 
 ipcMain.handle("select-folder", async (): Promise<SelectFolderResult> => {
 	const { canceled, filePaths } = await dialog.showOpenDialog({
