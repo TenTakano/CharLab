@@ -1,4 +1,3 @@
-import { on } from "node:events";
 import { type FC, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 const Button: FC<React.ButtonHTMLAttributes<HTMLButtonElement>> = ({
