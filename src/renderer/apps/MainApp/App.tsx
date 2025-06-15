@@ -1,4 +1,4 @@
-import { type FC, useCallback, useEffect, useRef, useState } from "react";
+import { type FC, useEffect, useRef, useState } from "react";
 
 import type { Settings } from "@main/settings";
 import ContextMenu from "@ui/components/ContextMenu";
@@ -23,17 +23,12 @@ const App: FC = () => {
 		setFps,
 		setDirection,
 		loadFolder,
-		changeSize: changeImageSize,
 		loading,
 	} = useImageCanvas();
 
 	useEffect(() => {
 		const unsubscribe = window.electronAPI.onSettingsUpdates(
 			async (settings: Partial<Settings>) => {
-				if (settings.windowSize) {
-					// await changeImageSize(settings.windowSize);
-					// To be implemented: Handle window size changes
-				}
 				if (settings.playbackDirection) {
 					setDirection(settings.playbackDirection);
 				}
@@ -104,9 +99,6 @@ const App: FC = () => {
 				position={contextMenuPosition}
 				onSelectDirectory={async () => {
 					await loadFolder();
-				}}
-				onResize={async (size) => {
-					await changeImageSize(size);
 				}}
 				onClose={() => setShowContextMenu(false)}
 			/>

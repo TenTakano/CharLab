@@ -11,21 +11,6 @@ export const useImageCanvas = () => {
 
 	const [loading, setLoading] = useState(true);
 
-	// Resizing the canvas when the window size changes
-	useEffect(() => {
-		window.electronAPI.onWindowSizeChange(
-			(size: { width: number; height: number }) => {
-				if (!canvasRef.current) return;
-				canvasRef.current.width = size.width;
-				canvasRef.current.height = size.height;
-			},
-		);
-
-		window.electronAPI.onFolderChanged(() => {
-			setLoading(true);
-		});
-	}, []);
-
 	// Image Loading
 	const prepareImages = useCallback((files: string[]) => {
 		setLoading(true);
@@ -46,15 +31,22 @@ export const useImageCanvas = () => {
 		setLoading(false);
 	}, []);
 
+	// Listen for images updates
 	useEffect(() => {
-		window.electronAPI.onImagesReady((cachedFiles: string[]) => {
-			prepareImages(cachedFiles);
+		const unsubscribe = window.electronAPI.onImagesReady(
+			(cachedFiles: string[]) => {
+				prepareImages(cachedFiles);
 
-			if (!wrapperRef.current || !canvasRef.current) return;
-			const { clientWidth, clientHeight } = wrapperRef.current;
-			canvasRef.current.width = clientWidth;
-			canvasRef.current.height = clientHeight;
-		});
+				if (!wrapperRef.current || !canvasRef.current) return;
+				const { clientWidth, clientHeight } = wrapperRef.current;
+				canvasRef.current.width = clientWidth;
+				canvasRef.current.height = clientHeight;
+			},
+		);
+
+		return () => {
+			unsubscribe();
+		};
 	}, [prepareImages]);
 
 	// Drawing Logic
@@ -160,14 +152,6 @@ export const useImageCanvas = () => {
 		prepareImages(result.files);
 	}, [prepareImages]);
 
-	const changeSize = useCallback(
-		async (size: { width: number; height: number }) => {
-			setLoading(true);
-			await window.electronAPI.changeImageSize(size);
-		},
-		[],
-	);
-
 	return {
 		wrapperRef,
 		canvasRef,
@@ -178,7 +162,6 @@ export const useImageCanvas = () => {
 		setPlaying,
 		setDirection,
 		loadFolder,
-		changeSize,
 		loading,
 	};
 };

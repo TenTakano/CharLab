@@ -1,7 +1,11 @@
+import fs from "node:fs";
+
+import { BrowserWindow, app, dialog, ipcMain } from "electron";
+import { imageSize } from "image-size";
+
 import type { SelectFolderResult } from "@/common/type";
 import { createMainWindow } from "@main/windows/mainWindow";
 import { createSettingsWindow } from "@main/windows/settingsWindow";
-import { BrowserWindow, app, dialog, ipcMain } from "electron";
 import {
 	cacheFiles,
 	generateResizedCache,
@@ -28,10 +32,27 @@ const changeWindowSize = (
 	win.setResizable(false);
 };
 
+const updateImageSet = async () => {
+	const images = await loadCachedImages();
+	if (mainWindow && !mainWindow.isDestroyed()) {
+		const buffer = fs.readFileSync(images[0]);
+		const size = imageSize(buffer);
+		changeWindowSize(mainWindow, { width: size.width, height: size.height });
+		mainWindow.webContents.send("images:ready", images);
+	}
+};
+
 ipcMain.handle("settings:getAll", () => getSettings());
 
 ipcMain.on("settings:set", (_event, settings: Partial<Settings>) => {
 	setSettings(settings);
+	if (settings.windowSize) {
+		(async () => {
+			const windowSize = settings.windowSize!;
+			await generateResizedCache(windowSize.width, windowSize.height);
+			setWindowSize(windowSize.width, windowSize.height);
+		})();
+	}
 	mainWindow?.webContents.send("onSettingsUpdates", settings);
 });
 
@@ -51,20 +72,6 @@ ipcMain.handle("select-folder", async (): Promise<SelectFolderResult> => {
 	await generateResizedCache(width, height);
 	return { canceled: false, files: await loadCachedImages() };
 });
-
-ipcMain.on(
-	"change-image-size",
-	async (event, size: { width: number; height: number }) => {
-		await generateResizedCache(size.width, size.height);
-		setWindowSize(size.width, size.height);
-		const win = BrowserWindow.fromWebContents(event.sender);
-		if (win) {
-			win.webContents.send("images-ready", await loadCachedImages());
-			changeWindowSize(win, size);
-			win.webContents.send("window-size-change", size);
-		}
-	},
-);
 
 ipcMain.on("move-window", (event, delta: { dx: number; dy: number }) => {
 	const win = BrowserWindow.fromWebContents(event.sender);
@@ -104,7 +111,7 @@ app.commandLine.appendSwitch("enable-logging");
 app.whenReady().then(async () => {
 	mainWindow = createMainWindow();
 	mainWindow!.webContents.once("did-finish-load", async () => {
-		mainWindow!.webContents.send("images-ready", await loadCachedImages());
+		mainWindow!.webContents.send("images:ready", await updateImageSet());
 	});
 });
 

@@ -6,16 +6,15 @@ import type { Settings } from "@main/settings";
 declare global {
 	interface Window {
 		electronAPI: {
+			// common
 			getSettings: () => Settings;
 			setSettings: (settings: Partial<Settings>) => void;
 			onSettingsUpdates: (callback: (settings: Settings) => void) => () => void;
-			onImagesReady: (callback: (images: string[]) => void) => void;
+
+			// main window
+			onImagesReady: (callback: (images: string[]) => void) => () => void;
 			onFolderChanged: (callback: () => void) => void;
-			onWindowSizeChange: (
-				callback: (size: { width: number; height: number }) => void,
-			) => void;
 			selectFolder: () => Promise<SelectFolderResult>;
-			changeImageSize: (size: { width: number; height: number }) => void;
 			moveWindow: (delta: { dx: number; dy: number }) => void;
 
 			// Settings window
@@ -48,9 +47,14 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	},
 
 	onImagesReady: (callback: (images: string[]) => void) => {
-		ipcRenderer.on("images-ready", (_event, state) => {
-			callback(state);
-		});
+		const listener = (_event: Electron.IpcRendererEvent, images: string[]) => {
+			callback(images);
+		};
+		ipcRenderer.on("images:ready", listener);
+
+		return () => {
+			ipcRenderer.removeListener("images:ready", listener);
+		};
 	},
 
 	onFolderChanged: (callback: () => void) => {
@@ -59,19 +63,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 		});
 	},
 
-	onWindowSizeChange: (
-		callback: (size: { width: number; height: number }) => void,
-	) => {
-		ipcRenderer.on("window-size-change", (_event, size) => {
-			callback(size);
-		});
-	},
-
 	selectFolder: () => ipcRenderer.invoke("select-folder"),
-
-	changeImageSize: (size: { width: number; height: number }) => {
-		ipcRenderer.send("change-image-size", size);
-	},
 
 	moveWindow: (delta: { dx: number; dy: number }) => {
 		ipcRenderer.send("move-window", delta);
