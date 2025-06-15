@@ -13,28 +13,9 @@ const App: FC = () => {
 		onMouseDown: onCanvasMouseDown,
 		onMouseMove: onCanvasMouseMove,
 		onMouseUp: onCanvasMouseUp,
-		setFps,
-		setDirection,
 		loadFolder,
 		loading,
 	} = useImageCanvas();
-
-	useEffect(() => {
-		const unsubscribe = window.electronAPI.onSettingsUpdates(
-			async (settings: Partial<Settings>) => {
-				if (settings.playbackDirection) {
-					setDirection(settings.playbackDirection);
-				}
-				if (settings.fps) {
-					setFps(settings.fps);
-				}
-			},
-		);
-
-		return () => {
-			unsubscribe();
-		};
-	}, [setDirection, setFps]);
 
 	// Set initial canvas size based on wrapper dimensions
 	useEffect(() => {

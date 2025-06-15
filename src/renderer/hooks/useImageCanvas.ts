@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import type { Settings } from "@main/settings";
 import noImage from "@ui/assets/noimage.svg";
 
 export const useImageCanvas = () => {
@@ -109,6 +110,26 @@ export const useImageCanvas = () => {
 		};
 	}, [playing, images.length, fps, direction]);
 
+	// Settings Updates
+	useEffect(() => {
+		const unsubscribe = window.electronAPI.onSettingsUpdates(
+			async (settings: Partial<Settings>) => {
+				if (settings.autoPlay !== undefined) {
+					setPlaying(settings.autoPlay);
+				}
+				if (settings.playbackDirection) {
+					setDirection(settings.playbackDirection);
+				}
+				if (settings.fps) {
+					setFps(settings.fps);
+				}
+			},
+		);
+		return () => {
+			unsubscribe();
+		};
+	}, []);
+
 	// Mouse Controls
 	const isRotating = useRef(false);
 	const startX = useRef(0);
@@ -158,9 +179,6 @@ export const useImageCanvas = () => {
 		onMouseDown,
 		onMouseMove,
 		onMouseUp,
-		setFps,
-		setPlaying,
-		setDirection,
 		loadFolder,
 		loading,
 	};
