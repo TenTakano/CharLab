@@ -45,8 +45,9 @@ export const createMainWindow = () => {
 		maximizable: false,
 		minimizable: true,
 		transparent: true,
-		frame: false,
 		alwaysOnTop: true,
+		frame: false,
+		skipTaskbar: true,
 		webPreferences: {
 			nodeIntegration: false,
 			contextIsolation: true,

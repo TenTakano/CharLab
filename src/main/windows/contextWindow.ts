@@ -26,6 +26,9 @@ export function createContextWindow(
 		minimizable: false,
 		alwaysOnTop: true,
 		show: false,
+		frame: false,
+		skipTaskbar: true,
+		modal: true,
 		webPreferences: {
 			nodeIntegration: false,
 			contextIsolation: true,
@@ -38,6 +41,9 @@ export function createContextWindow(
 	win.loadFile(path.join(__dirname, "menu.html"));
 	win.on("close", (event) => {
 		event.preventDefault();
+		win.hide();
+	});
+	win.on("blur", () => {
 		win.hide();
 	});
 
