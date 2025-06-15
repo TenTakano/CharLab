@@ -11,21 +11,6 @@ export const useImageCanvas = () => {
 
 	const [loading, setLoading] = useState(true);
 
-	// Resizing the canvas when the window size changes
-	useEffect(() => {
-		window.electronAPI.onWindowSizeChange(
-			(size: { width: number; height: number }) => {
-				if (!canvasRef.current) return;
-				canvasRef.current.width = size.width;
-				canvasRef.current.height = size.height;
-			},
-		);
-
-		window.electronAPI.onFolderChanged(() => {
-			setLoading(true);
-		});
-	}, []);
-
 	// Image Loading
 	const prepareImages = useCallback((files: string[]) => {
 		setLoading(true);
@@ -167,14 +152,6 @@ export const useImageCanvas = () => {
 		prepareImages(result.files);
 	}, [prepareImages]);
 
-	const changeSize = useCallback(
-		async (size: { width: number; height: number }) => {
-			setLoading(true);
-			await window.electronAPI.changeImageSize(size);
-		},
-		[],
-	);
-
 	return {
 		wrapperRef,
 		canvasRef,
@@ -185,7 +162,6 @@ export const useImageCanvas = () => {
 		setPlaying,
 		setDirection,
 		loadFolder,
-		changeSize,
 		loading,
 	};
 };

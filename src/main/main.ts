@@ -46,6 +46,13 @@ ipcMain.handle("settings:getAll", () => getSettings());
 
 ipcMain.on("settings:set", (_event, settings: Partial<Settings>) => {
 	setSettings(settings);
+	if (settings.windowSize) {
+		(async () => {
+			const windowSize = settings.windowSize!;
+			await generateResizedCache(windowSize.width, windowSize.height);
+			setWindowSize(windowSize.width, windowSize.height);
+		})();
+	}
 	mainWindow?.webContents.send("onSettingsUpdates", settings);
 });
 
@@ -65,20 +72,6 @@ ipcMain.handle("select-folder", async (): Promise<SelectFolderResult> => {
 	await generateResizedCache(width, height);
 	return { canceled: false, files: await loadCachedImages() };
 });
-
-ipcMain.on(
-	"change-image-size",
-	async (event, size: { width: number; height: number }) => {
-		await generateResizedCache(size.width, size.height);
-		setWindowSize(size.width, size.height);
-		const win = BrowserWindow.fromWebContents(event.sender);
-		if (win) {
-			win.webContents.send("images:ready", await loadCachedImages());
-			changeWindowSize(win, size);
-			win.webContents.send("window-size-change", size);
-		}
-	},
-);
 
 ipcMain.on("move-window", (event, delta: { dx: number; dy: number }) => {
 	const win = BrowserWindow.fromWebContents(event.sender);

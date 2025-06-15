@@ -1,4 +1,4 @@
-import { type FC, useCallback, useEffect, useRef, useState } from "react";
+import { type FC, useEffect, useRef, useState } from "react";
 
 import type { Settings } from "@main/settings";
 import ContextMenu from "@ui/components/ContextMenu";
@@ -29,10 +29,6 @@ const App: FC = () => {
 	useEffect(() => {
 		const unsubscribe = window.electronAPI.onSettingsUpdates(
 			async (settings: Partial<Settings>) => {
-				if (settings.windowSize) {
-					// await changeImageSize(settings.windowSize);
-					// To be implemented: Handle window size changes
-				}
 				if (settings.playbackDirection) {
 					setDirection(settings.playbackDirection);
 				}
