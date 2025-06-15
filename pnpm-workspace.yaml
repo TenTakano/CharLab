@@ -1,7 +1,6 @@
 ignoredBuiltDependencies:
   - '@biomejs/biome'
   - '@parcel/watcher'
-  - '@tailwindcss/oxide'
   - electron-winstaller
 
 onlyBuiltDependencies:
