@@ -10,12 +10,20 @@ declare global {
 			getSettings: () => Settings;
 			setSettings: (settings: Partial<Settings>) => void;
 			onSettingsUpdates: (callback: (settings: Settings) => void) => () => void;
+			syncWindowSizeToComponent: (size: {
+				width: number;
+				height: number;
+			}) => void;
 
 			// main window
 			onImagesReady: (callback: (images: string[]) => void) => () => void;
 			onFolderChanged: (callback: () => void) => void;
 			selectFolder: () => Promise<SelectFolderResult>;
 			moveWindow: (delta: { dx: number; dy: number }) => void;
+
+			// Context window
+			openContextWindow: (cursorPosition: { x: number; y: number }) => void;
+			closeContextWindow: () => void;
 
 			// Settings window
 			openSettingsWindow: () => void;
@@ -46,6 +54,10 @@ contextBridge.exposeInMainWorld("electronAPI", {
 		};
 	},
 
+	syncWindowSizeToComponent: (size: { width: number; height: number }) => {
+		ipcRenderer.send("syncWindowSizeToComponent", size);
+	},
+
 	onImagesReady: (callback: (images: string[]) => void) => {
 		const listener = (_event: Electron.IpcRendererEvent, images: string[]) => {
 			callback(images);
@@ -68,6 +80,12 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	moveWindow: (delta: { dx: number; dy: number }) => {
 		ipcRenderer.send("move-window", delta);
 	},
+
+	// Context window related APIs
+	openContextWindow: (cursorPosition: { x: number; y: number }) =>
+		ipcRenderer.send("openWindow:context", cursorPosition),
+
+	closeContextWindow: () => ipcRenderer.send("closeWindow:context"),
 
 	// Settings window related APIs
 	openSettingsWindow: () => ipcRenderer.send("openWindow:settings"),

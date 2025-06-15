@@ -77,6 +77,7 @@ module.exports = (_env, argv) => {
 			name: "renderer",
 			entry: {
 				index: "./src/renderer/apps/MainApp/index.tsx",
+				contextMenu: "./src/renderer/apps/MenuApp/index.tsx",
 				settings: "./src/renderer/apps/SettingsApp/index.tsx",
 			},
 			target: "electron-renderer",
@@ -89,6 +90,11 @@ module.exports = (_env, argv) => {
 					template: "./public/index.html",
 					filename: "index.html",
 					chunks: ["index"],
+				}),
+				new HtmlWebpackPlugin({
+					template: "./public/menu.html",
+					filename: "menu.html",
+					chunks: ["contextMenu"],
 				}),
 				new HtmlWebpackPlugin({
 					template: "./public/settings.html",

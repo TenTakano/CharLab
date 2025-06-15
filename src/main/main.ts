@@ -4,8 +4,10 @@ import { BrowserWindow, app, dialog, ipcMain } from "electron";
 import { imageSize } from "image-size";
 
 import type { SelectFolderResult } from "@/common/type";
+import { createContextWindow } from "@main/windows/contextWindow";
 import { createMainWindow } from "@main/windows/mainWindow";
 import { createSettingsWindow } from "@main/windows/settingsWindow";
+import { changeWindowPosition, changeWindowSize } from "@main/windows/utils";
 import {
 	cacheFiles,
 	generateResizedCache,
@@ -21,16 +23,8 @@ import {
 } from "./settings";
 
 let mainWindow: BrowserWindow | null = null;
-let settingsWin: BrowserWindow | null = null;
-
-const changeWindowSize = (
-	win: BrowserWindow,
-	size: { width: number; height: number },
-) => {
-	win.setResizable(true);
-	win.setSize(size.width, size.height);
-	win.setResizable(false);
-};
+let contextWindow: BrowserWindow | null = null;
+let settingsWindow: BrowserWindow | null = null;
 
 const updateImageSet = async () => {
 	const images = await loadCachedImages();
@@ -55,6 +49,23 @@ ipcMain.on("settings:set", (_event, settings: Partial<Settings>) => {
 	}
 	mainWindow?.webContents.send("onSettingsUpdates", settings);
 });
+
+ipcMain.on(
+	"syncWindowSizeToComponent",
+	(event, size: { width: number; height: number }) => {
+		if (!mainWindow || mainWindow.isDestroyed()) return;
+
+		const senderWin = BrowserWindow.fromWebContents(event.sender);
+		if (senderWin) {
+			changeWindowSize(senderWin, size);
+			const currentPosition = senderWin.getPosition();
+			changeWindowPosition(senderWin, {
+				x: currentPosition[0],
+				y: currentPosition[1],
+			});
+		}
+	},
+);
 
 ipcMain.handle("select-folder", async (): Promise<SelectFolderResult> => {
 	const { canceled, filePaths } = await dialog.showOpenDialog({
@@ -84,27 +95,55 @@ ipcMain.on("move-window", (event, delta: { dx: number; dy: number }) => {
 	}
 });
 
+ipcMain.on(
+	"openWindow:context",
+	(_event, cursorPosition: { x: number; y: number }) => {
+		if (!mainWindow) return;
+
+		const winPos = mainWindow.getPosition();
+		const globalPosition = {
+			x: cursorPosition.x + winPos[0],
+			y: cursorPosition.y + winPos[1],
+		};
+
+		if (contextWindow && !contextWindow.isDestroyed()) {
+			changeWindowPosition(contextWindow, globalPosition);
+			contextWindow.show();
+			contextWindow.focus();
+			return;
+		}
+
+		contextWindow = createContextWindow(mainWindow, globalPosition);
+	},
+);
+
+ipcMain.on("closeWindow:context", () => {
+	if (contextWindow && !contextWindow.isDestroyed()) {
+		contextWindow.hide();
+	}
+});
+
 ipcMain.on("openWindow:settings", () => {
 	if (!mainWindow) return;
 
-	if (settingsWin && !settingsWin.isDestroyed()) {
-		settingsWin.show();
-		settingsWin.focus();
+	if (settingsWindow && !settingsWindow.isDestroyed()) {
+		settingsWindow.show();
+		settingsWindow.focus();
 		return;
 	}
 
-	settingsWin = createSettingsWindow(mainWindow);
+	settingsWindow = createSettingsWindow(mainWindow);
 });
 
 ipcMain.on("closeWindow:settings", () => {
-	if (settingsWin && !settingsWin.isDestroyed()) {
-		settingsWin.hide();
+	if (settingsWindow && !settingsWindow.isDestroyed()) {
+		settingsWindow.hide();
 	}
 });
 
 ipcMain.on("set-settings-window-size", (_event, size) => {
-	if (!settingsWin || settingsWin.isDestroyed()) return;
-	changeWindowSize(settingsWin, size);
+	if (!settingsWindow || settingsWindow.isDestroyed()) return;
+	changeWindowSize(settingsWindow, size);
 });
 
 app.commandLine.appendSwitch("enable-logging");

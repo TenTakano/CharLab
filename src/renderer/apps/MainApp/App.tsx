@@ -53,8 +53,7 @@ const App: FC = () => {
 
 	const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
 		e.preventDefault();
-		setContextMenuPosition({ x: e.clientX, y: e.clientY });
-		setShowContextMenu(true);
+		window.electronAPI.openContextWindow({ x: e.clientX, y: e.clientY });
 	};
 
 	const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -94,14 +93,6 @@ const App: FC = () => {
 			onMouseUp={handleMouseUp}
 			onMouseLeave={handleMouseUp}
 		>
-			<ContextMenu
-				show={showContextMenu}
-				position={contextMenuPosition}
-				onSelectDirectory={async () => {
-					await loadFolder();
-				}}
-				onClose={() => setShowContextMenu(false)}
-			/>
 			<canvas ref={canvasRef} className="w-full h-full block" />
 			{loading && (
 				<div className="absolute inset-0 z-10 flex items-center justify-center">

@@ -1,6 +1,6 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import { createRoot } from "react-dom/client";
-import "@ui/styles/tailwind.css";
+import "@ui/styles/global.css";
 import App from "./App";
 
 const container = document.getElementById("root")!;
