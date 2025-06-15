@@ -47,7 +47,7 @@ const App: React.FC = () => {
 				フォルダを選択
 			</button>
 			<button type="button" onClick={handleAutoPlay}>
-				自動再生する
+				{autoPlayback ? "自動再生を停止する" : "自動再生する"}
 			</button>
 			<button type="button" onClick={handleSettings}>
 				設定
