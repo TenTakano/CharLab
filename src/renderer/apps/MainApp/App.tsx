@@ -1,77 +1,84 @@
 import { type FC, useEffect, useRef, useState } from "react";
 
-import { useImageCanvas } from "@ui/hooks/useImageCanvas";
+// import { useImageCanvas } from "@ui/hooks/useImageCanvas";
+import ViewerCanvas from "@ui/components/ViewerCanvas";
 
 const App: FC = () => {
+	const wrapperRef = useRef<HTMLDivElement>(null);
 	const isMovingWindow = useRef(false);
 	const lastScreen = useRef({ x: 0, y: 0 });
 
-	const {
-		wrapperRef,
-		canvasRef,
-		onMouseDown: onCanvasMouseDown,
-		onMouseMove: onCanvasMouseMove,
-		onMouseUp: onCanvasMouseUp,
-		loadFolder,
-		loading,
-	} = useImageCanvas();
+	// const {
+	// 	wrapperRef,
+	// 	canvasRef,
+	// 	onMouseDown: onCanvasMouseDown,
+	// 	onMouseMove: onCanvasMouseMove,
+	// 	onMouseUp: onCanvasMouseUp,
+	// 	// loadFolder,
+	// 	loading,
+	// } = useImageCanvas();
 
-	// Set initial canvas size based on wrapper dimensions
-	useEffect(() => {
-		if (!wrapperRef.current || !canvasRef.current) return;
-		const { clientWidth, clientHeight } = wrapperRef.current;
-		canvasRef.current.width = clientWidth;
-		canvasRef.current.height = clientHeight;
-	}, [wrapperRef, canvasRef]);
+	// // Set initial canvas size based on wrapper dimensions
+	// useEffect(() => {
+	// 	if (!wrapperRef.current || !canvasRef.current) return;
+	// 	const { clientWidth, clientHeight } = wrapperRef.current;
+	// 	canvasRef.current.width = clientWidth;
+	// 	canvasRef.current.height = clientHeight;
+	// }, [wrapperRef, canvasRef]);
 
 	const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
 		e.preventDefault();
 		window.electronAPI.openContextWindow({ x: e.clientX, y: e.clientY });
 	};
 
-	const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-		onCanvasMouseDown(e);
-		if (!e.shiftKey) return;
+	// const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+	// 	onCanvasMouseDown(e);
+	// 	if (!e.shiftKey) return;
 
-		isMovingWindow.current = true;
-		lastScreen.current = { x: e.screenX, y: e.screenY };
-		wrapperRef.current!.style.cursor = "move";
-	};
+	// 	isMovingWindow.current = true;
+	// 	lastScreen.current = { x: e.screenX, y: e.screenY };
+	// 	wrapperRef.current!.style.cursor = "move";
+	// };
 
-	const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-		onCanvasMouseMove(e);
-		if (!isMovingWindow.current) return;
+	// const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+	// 	onCanvasMouseMove(e);
+	// 	if (!isMovingWindow.current) return;
 
-		const dx = e.screenX - lastScreen.current.x;
-		const dy = e.screenY - lastScreen.current.y;
-		lastScreen.current = { x: e.screenX, y: e.screenY };
-		window.electronAPI.moveWindow({ dx, dy });
-	};
+	// 	const dx = e.screenX - lastScreen.current.x;
+	// 	const dy = e.screenY - lastScreen.current.y;
+	// 	lastScreen.current = { x: e.screenX, y: e.screenY };
+	// 	window.electronAPI.moveWindow({ dx, dy });
+	// };
 
-	const handleMouseUp = () => {
-		onCanvasMouseUp();
-		if (!isMovingWindow.current) return;
+	// const handleMouseUp = () => {
+	// 	onCanvasMouseUp();
+	// 	if (!isMovingWindow.current) return;
 
-		isMovingWindow.current = false;
-		wrapperRef.current!.style.cursor = "grab";
-	};
+	// 	isMovingWindow.current = false;
+	// 	wrapperRef.current!.style.cursor = "grab";
+	// };
 
 	return (
 		<div
 			ref={wrapperRef}
 			className="w-screen h-screen cursor-grab"
 			onContextMenu={handleContextMenu}
-			onMouseDown={handleMouseDown}
-			onMouseMove={handleMouseMove}
-			onMouseUp={handleMouseUp}
-			onMouseLeave={handleMouseUp}
+			// onMouseDown={handleMouseDown}
+			// onMouseMove={handleMouseMove}
+			// onMouseUp={handleMouseUp}
+			// onMouseLeave={handleMouseUp}
 		>
-			<canvas ref={canvasRef} className="w-full h-full block" />
+			{/* <canvas ref={canvasRef} className="w-full h-full block" />
 			{loading && (
 				<div className="absolute inset-0 z-10 flex items-center justify-center">
 					<div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
 				</div>
-			)}
+			)} */}
+			<ViewerCanvas
+				onMouseDown={() => {}}
+				onMouseMove={() => {}}
+				onMouseUp={() => {}}
+			/>
 		</div>
 	);
 };
