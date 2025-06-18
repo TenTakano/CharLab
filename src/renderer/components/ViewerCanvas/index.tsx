@@ -23,18 +23,24 @@ const ViewerCanvas: React.FC<Props> = () => {
 		const unsubscribe = window.electronAPI.onImagesReady(
 			(cachedFiles: string[]) => {
 				setLoading(true);
-				const newImages = cachedFiles
-					.sort((a, b) => a.localeCompare(b))
-					.map((file) => {
-						const img = new Image();
-						img.src = `file://${file}`;
-						return img;
-					});
 
-				if (newImages.length > 0) {
-					setImages(newImages);
-					setIndex(0);
+				let newImages: HTMLImageElement[];
+				if (cachedFiles.length > 0) {
+					newImages = cachedFiles
+						.sort((a, b) => a.localeCompare(b))
+						.map((file) => {
+							const img = new Image();
+							img.src = `file://${file}`;
+							return img;
+						});
+				} else {
+					const img = new Image();
+					img.src = noImage;
+					newImages = [img];
 				}
+
+				setImages(newImages);
+				setIndex(0);
 				setLoading(false);
 			},
 		);
@@ -64,16 +70,11 @@ const ViewerCanvas: React.FC<Props> = () => {
 	// Drawing Logic
 	useEffect(() => {
 		if (!canvasRef.current) return;
+		if (images.length === 0) return;
 		const ctx = canvasRef.current.getContext("2d");
 		if (!ctx) return;
 
-		let img: HTMLImageElement;
-		if (images.length > 0) {
-			img = images[index];
-		} else {
-			img = new Image();
-			img.src = noImage;
-		}
+		const img = images[index];
 
 		const draw = () => {
 			if (!canvasRef.current) return;
