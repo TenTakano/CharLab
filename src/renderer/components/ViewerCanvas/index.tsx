@@ -57,6 +57,19 @@ const ViewerCanvas: React.FC<Props> = () => {
 		};
 	}, [loadImages]);
 
+	// Canvas Size Adjustment
+	useEffect(() => {
+		if (images.length === 0) return;
+		const canvas = canvasRef.current;
+		if (!canvas) return;
+
+		const img = images[index];
+		if (img.naturalWidth && img.naturalHeight) {
+			canvas.width = img.naturalWidth;
+			canvas.height = img.naturalHeight;
+		}
+	}, [images, index]);
+
 	// Drawing Logic
 	useEffect(() => {
 		if (!canvasRef.current) return;
