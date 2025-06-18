@@ -1,0 +1,34 @@
+.loadingOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  max-width: 100vw;
+  max-height: 100vh;
+  overflow: hidden;
+}
+
+.loadingSpinner {
+  width: 3rem;
+  height: 3rem;
+  min-width: 1.5rem;
+  min-height: 1.5rem;
+  max-width: 80vw;
+  max-height: 80vh;
+  border: 0.3rem solid #fff;
+  border-top: 0.3rem solid #888;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  box-shadow: 0 0 0.5rem #888;
+  box-sizing: border-box;
+  object-fit: contain;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

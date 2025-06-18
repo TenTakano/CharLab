@@ -35,6 +35,7 @@ ipcMain.on("settings:set", (_event, settings: Partial<Settings>) => {
 	setSettings(settings);
 	if (settings.windowSize) {
 		(async () => {
+			mainWindow?.webContents.send("images:startToGenerateCache");
 			const windowSize = settings.windowSize!;
 			await generateResizedCache(windowSize.width, windowSize.height);
 			await updateImageSet();
