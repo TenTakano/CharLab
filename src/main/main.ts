@@ -1,7 +1,4 @@
-import fs from "node:fs";
-
 import { BrowserWindow, app, dialog, ipcMain } from "electron";
-import { imageSize } from "image-size";
 
 import type { SelectFolderResult } from "@/common/type";
 import { createContextWindow } from "@main/windows/contextWindow";
@@ -29,9 +26,6 @@ let settingsWindow: BrowserWindow | null = null;
 const updateImageSet = async () => {
 	const images = await loadCachedImages();
 	if (mainWindow && !mainWindow.isDestroyed()) {
-		const buffer = fs.readFileSync(images[0]);
-		const size = imageSize(buffer);
-		changeWindowSize(mainWindow, { width: size.width, height: size.height });
 		mainWindow.webContents.send("images:ready", images);
 	}
 };

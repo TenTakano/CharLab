@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import type { Settings } from "@main/settings";
 import noImage from "@ui/assets/noimage.svg";
@@ -18,36 +18,29 @@ const ViewerCanvas: React.FC<Props> = () => {
 	const [index, setIndex] = useState(0);
 	const [loading, setLoading] = useState(true);
 
-	// Initialize Logic
-	const loadImages = useCallback((files: string[]) => {
-		const newImages = files
-			.sort((a, b) => a.localeCompare(b))
-			.map((file) => {
-				const img = new Image();
-				img.src = `file://${file}`;
-				return img;
-			});
-
-		if (newImages.length > 0) {
-			setImages(newImages);
-			setIndex(0);
-		}
-	}, []);
-
+	// Set Images Loading Callback
 	useEffect(() => {
-		const canvas = canvasRef.current;
-		if (canvas) {
-			const context = canvas.getContext("2d");
-			if (context) {
-				context.fillStyle = "white"; // for debugging
-				context.fillRect(0, 0, canvas.width, canvas.height);
-			}
-		}
-
 		const unsubscribe = window.electronAPI.onImagesReady(
 			(cachedFiles: string[]) => {
 				setLoading(true);
-				loadImages(cachedFiles);
+
+				let newImages: HTMLImageElement[];
+				if (cachedFiles.length > 0) {
+					newImages = cachedFiles
+						.sort((a, b) => a.localeCompare(b))
+						.map((file) => {
+							const img = new Image();
+							img.src = `file://${file}`;
+							return img;
+						});
+				} else {
+					const img = new Image();
+					img.src = noImage;
+					newImages = [img];
+				}
+
+				setImages(newImages);
+				setIndex(0);
 				setLoading(false);
 			},
 		);
@@ -55,21 +48,33 @@ const ViewerCanvas: React.FC<Props> = () => {
 		return () => {
 			unsubscribe();
 		};
-	}, [loadImages]);
+	}, []);
+
+	// Canvas/Window Size Adjustment
+	useEffect(() => {
+		if (images.length === 0) return;
+		const canvas = canvasRef.current;
+		if (!canvas) return;
+
+		const img = images[index];
+		if (img.naturalWidth && img.naturalHeight) {
+			canvas.width = img.naturalWidth;
+			canvas.height = img.naturalHeight;
+			window.electronAPI.syncWindowSizeToComponent({
+				width: img.naturalWidth,
+				height: img.naturalHeight,
+			});
+		}
+	}, [images, index]);
 
 	// Drawing Logic
 	useEffect(() => {
 		if (!canvasRef.current) return;
+		if (images.length === 0) return;
 		const ctx = canvasRef.current.getContext("2d");
 		if (!ctx) return;
 
-		let img: HTMLImageElement;
-		if (images.length > 0) {
-			img = images[index];
-		} else {
-			img = new Image();
-			img.src = noImage;
-		}
+		const img = images[index];
 
 		const draw = () => {
 			if (!canvasRef.current) return;
