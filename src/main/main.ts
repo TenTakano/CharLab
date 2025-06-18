@@ -144,7 +144,7 @@ app.commandLine.appendSwitch("enable-logging");
 app.whenReady().then(async () => {
 	mainWindow = createMainWindow();
 	mainWindow!.webContents.once("did-finish-load", async () => {
-		mainWindow!.webContents.send("images:ready", await updateImageSet());
+		await updateImageSet();
 	});
 });
 
