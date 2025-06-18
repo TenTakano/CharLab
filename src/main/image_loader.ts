@@ -81,9 +81,7 @@ export async function generateResizedCache(
 		);
 		if (files.length === 0) return;
 
-		if (fsSync.existsSync(resizedCacheDir)) {
-			await !fs.rm(resizedCacheDir, { recursive: true, force: true });
-		}
+		await fs.rm(resizedCacheDir, { recursive: true, force: true });
 		await fs.mkdir(resizedCacheDir, { recursive: true });
 
 		for (const input of files) {
