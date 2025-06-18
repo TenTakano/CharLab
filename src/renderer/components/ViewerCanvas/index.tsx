@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import type { Settings } from "@main/settings";
 import noImage from "@ui/assets/noimage.svg";
