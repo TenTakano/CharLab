@@ -1,71 +1,57 @@
-import { type FC, useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 
 // import { useImageCanvas } from "@ui/hooks/useImageCanvas";
 import ViewerCanvas from "@ui/components/ViewerCanvas";
+import type { ViewerCanvasHandle } from "@ui/components/ViewerCanvas/types";
+import style from "./style.module.css";
 
-const App: FC = () => {
+const App: React.FC = () => {
 	const wrapperRef = useRef<HTMLDivElement>(null);
+	const canvasRef = useRef<ViewerCanvasHandle>(null);
 	const isMovingWindow = useRef(false);
 	const lastScreen = useRef({ x: 0, y: 0 });
-
-	// const {
-	// 	wrapperRef,
-	// 	canvasRef,
-	// 	onMouseDown: onCanvasMouseDown,
-	// 	onMouseMove: onCanvasMouseMove,
-	// 	onMouseUp: onCanvasMouseUp,
-	// 	// loadFolder,
-	// 	loading,
-	// } = useImageCanvas();
-
-	// // Set initial canvas size based on wrapper dimensions
-	// useEffect(() => {
-	// 	if (!wrapperRef.current || !canvasRef.current) return;
-	// 	const { clientWidth, clientHeight } = wrapperRef.current;
-	// 	canvasRef.current.width = clientWidth;
-	// 	canvasRef.current.height = clientHeight;
-	// }, [wrapperRef, canvasRef]);
 
 	const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
 		e.preventDefault();
 		window.electronAPI.openContextWindow({ x: e.clientX, y: e.clientY });
 	};
 
-	// const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-	// 	onCanvasMouseDown(e);
-	// 	if (!e.shiftKey) return;
+	const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+		canvasRef.current?.onMouseDown(e);
+		if (!e.shiftKey) return;
 
-	// 	isMovingWindow.current = true;
-	// 	lastScreen.current = { x: e.screenX, y: e.screenY };
-	// 	wrapperRef.current!.style.cursor = "move";
-	// };
+		isMovingWindow.current = true;
+		lastScreen.current = { x: e.screenX, y: e.screenY };
+		wrapperRef.current!.style.cursor = "move";
+	};
 
-	// const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-	// 	onCanvasMouseMove(e);
-	// 	if (!isMovingWindow.current) return;
+	const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+		canvasRef.current?.onMouseMove(e);
+		if (!isMovingWindow.current) return;
 
-	// 	const dx = e.screenX - lastScreen.current.x;
-	// 	const dy = e.screenY - lastScreen.current.y;
-	// 	lastScreen.current = { x: e.screenX, y: e.screenY };
-	// 	window.electronAPI.moveWindow({ dx, dy });
-	// };
+		const dx = e.screenX - lastScreen.current.x;
+		const dy = e.screenY - lastScreen.current.y;
+		lastScreen.current = { x: e.screenX, y: e.screenY };
+		window.electronAPI.moveWindow({ dx, dy });
+	};
 
-	// const handleMouseUp = () => {
-	// 	onCanvasMouseUp();
-	// 	if (!isMovingWindow.current) return;
+	const handleMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
+		canvasRef.current?.onMouseUp(e);
+		if (!isMovingWindow.current) return;
 
-	// 	isMovingWindow.current = false;
-	// 	wrapperRef.current!.style.cursor = "grab";
-	// };
+		isMovingWindow.current = false;
+		wrapperRef.current!.style.cursor = "grab";
+	};
 
 	return (
 		<div
+			className={style.container}
 			ref={wrapperRef}
 			onContextMenu={handleContextMenu}
-			// onMouseDown={handleMouseDown}
-			// onMouseMove={handleMouseMove}
-			// onMouseUp={handleMouseUp}
-			// onMouseLeave={handleMouseUp}
+			onMouseDown={handleMouseDown}
+			onMouseMove={handleMouseMove}
+			onMouseUp={handleMouseUp}
+			onMouseLeave={handleMouseUp}
 		>
 			{/* <canvas ref={canvasRef} className="w-full h-full block" />
 			{loading && (
@@ -74,9 +60,10 @@ const App: FC = () => {
 				</div>
 			)} */}
 			<ViewerCanvas
-				onMouseDown={() => {}}
-				onMouseMove={() => {}}
-				onMouseUp={() => {}}
+				ref={canvasRef}
+				handleCursorChange={(cursor: string) => {
+					wrapperRef.current!.style.cursor = cursor;
+				}}
 			/>
 		</div>
 	);
