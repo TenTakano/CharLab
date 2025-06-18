@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import style from "./style.module.css";
 
 interface Props {
@@ -7,7 +8,20 @@ interface Props {
 }
 
 const ViewerCanvas: React.FC<Props> = () => {
-	return <canvas className={style.canvas} />;
+	const canvasRef = useRef<HTMLCanvasElement>(null);
+
+	useEffect(() => {
+		const canvas = canvasRef.current;
+		if (canvas) {
+			const context = canvas.getContext("2d");
+			if (context) {
+				context.fillStyle = "white"; // for debugging
+				context.fillRect(0, 0, canvas.width, canvas.height);
+			}
+		}
+	}, []);
+
+	return <canvas ref={canvasRef} className={style.canvas} />;
 };
 
 export default ViewerCanvas;

@@ -61,7 +61,6 @@ const App: FC = () => {
 	return (
 		<div
 			ref={wrapperRef}
-			className="w-screen h-screen cursor-grab"
 			onContextMenu={handleContextMenu}
 			// onMouseDown={handleMouseDown}
 			// onMouseMove={handleMouseMove}
