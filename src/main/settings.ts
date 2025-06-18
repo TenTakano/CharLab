@@ -67,11 +67,6 @@ export function getWindowSize(): { width: number; height: number } {
 	};
 }
 
-export function setWindowSize(width: number, height: number): void {
-	store.set("windowSize", { width, height });
-	cache.windowSize = { width, height };
-}
-
 export function getWindowPosition(): { x: number; y: number } {
 	return { ...cache.windowPosition };
 }

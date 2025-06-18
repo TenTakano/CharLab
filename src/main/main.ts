@@ -16,7 +16,6 @@ import {
 	getWindowSize,
 	setSettings,
 	setWindowPosition,
-	setWindowSize,
 } from "./settings";
 
 let mainWindow: BrowserWindow | null = null;
@@ -38,7 +37,7 @@ ipcMain.on("settings:set", (_event, settings: Partial<Settings>) => {
 		(async () => {
 			const windowSize = settings.windowSize!;
 			await generateResizedCache(windowSize.width, windowSize.height);
-			setWindowSize(windowSize.width, windowSize.height);
+			await updateImageSet();
 		})();
 	}
 	mainWindow?.webContents.send("onSettingsUpdates", settings);
