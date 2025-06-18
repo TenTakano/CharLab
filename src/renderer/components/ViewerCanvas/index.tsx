@@ -1,17 +1,17 @@
-import { useEffect, useRef, useState } from "react";
+import { useImperativeHandle, useEffect, useRef, useState } from "react";
 
 import type { Settings } from "@main/settings";
 import noImage from "@ui/assets/noimage.svg";
 import { useSettingsSync } from "@ui/hooks/useSettingsSync";
 import style from "./style.module.css";
+import type { ViewerCanvasHandle } from "./types";
 
 interface Props {
-	onMouseDown: (event: React.MouseEvent<HTMLCanvasElement>) => void;
-	onMouseMove: (event: React.MouseEvent<HTMLCanvasElement>) => void;
-	onMouseUp: (event: React.MouseEvent<HTMLCanvasElement>) => void;
+	ref: React.Ref<ViewerCanvasHandle>;
+	handleCursorChange?: (cursor: string) => void;
 }
 
-const ViewerCanvas: React.FC<Props> = () => {
+const ViewerCanvas: React.FC<Props> = ({ ref, handleCursorChange }) => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 
 	const [images, setImages] = useState<HTMLImageElement[]>([]);
@@ -135,9 +135,40 @@ const ViewerCanvas: React.FC<Props> = () => {
 		}
 	});
 
+	// Mouse Controls
+	const isRotating = useRef(false);
+	const startX = useRef(0);
+
+	useImperativeHandle(ref, () => ({
+		onMouseDown: (e) => {
+			if (e.shiftKey || images.length === 0) return;
+
+			isRotating.current = true;
+			startX.current = e.clientX;
+			handleCursorChange?.("grabbing");
+		},
+		onMouseMove: (e) => {
+			if (!isRotating.current || images.length === 0) return;
+
+			const deltaX = e.clientX - startX.current;
+			const step = Math.floor(deltaX / 10);
+			if (step !== 0) {
+				const next = (index + step + images.length) % images.length;
+				setIndex(next);
+				startX.current = e.clientX;
+			}
+		},
+		onMouseUp: () => {
+			if (!isRotating.current) return;
+
+			isRotating.current = false;
+			handleCursorChange?.("grab");
+		},
+	}));
+
 	return (
 		<>
-			<canvas ref={canvasRef} className={style.canvas} />
+			<canvas ref={canvasRef} />
 			{loading && (
 				<div className={style.loadingOverlay}>
 					<div className={style.loadingSpinner} />
