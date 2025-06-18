@@ -1,4 +1,4 @@
-import { useImperativeHandle, useEffect, useRef, useState } from "react";
+import { useEffect, useImperativeHandle, useRef, useState } from "react";
 
 import type { Settings } from "@main/settings";
 import noImage from "@ui/assets/noimage.svg";
@@ -20,7 +20,7 @@ const ViewerCanvas: React.FC<Props> = ({ ref, handleCursorChange }) => {
 
 	// Set Images Loading Callback
 	useEffect(() => {
-		const unsubscribe = window.electronAPI.onImagesReady(
+		const unsubscribeReady = window.electronAPI.onImagesReady(
 			(cachedFiles: string[]) => {
 				setLoading(true);
 
@@ -45,8 +45,14 @@ const ViewerCanvas: React.FC<Props> = ({ ref, handleCursorChange }) => {
 			},
 		);
 
+		const unsubscribeStartToGenerateCache =
+			window.electronAPI.onStartToGenerateCache(() => {
+				setLoading(true);
+			});
+
 		return () => {
-			unsubscribe();
+			unsubscribeReady();
+			unsubscribeStartToGenerateCache();
 		};
 	}, []);
 

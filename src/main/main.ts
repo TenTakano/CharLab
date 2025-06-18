@@ -16,7 +16,6 @@ import {
 	getWindowSize,
 	setSettings,
 	setWindowPosition,
-	setWindowSize,
 } from "./settings";
 
 let mainWindow: BrowserWindow | null = null;
@@ -36,9 +35,10 @@ ipcMain.on("settings:set", (_event, settings: Partial<Settings>) => {
 	setSettings(settings);
 	if (settings.windowSize) {
 		(async () => {
+			mainWindow?.webContents.send("images:startToGenerateCache");
 			const windowSize = settings.windowSize!;
 			await generateResizedCache(windowSize.width, windowSize.height);
-			setWindowSize(windowSize.width, windowSize.height);
+			await updateImageSet();
 		})();
 	}
 	mainWindow?.webContents.send("onSettingsUpdates", settings);
@@ -144,7 +144,7 @@ app.commandLine.appendSwitch("enable-logging");
 app.whenReady().then(async () => {
 	mainWindow = createMainWindow();
 	mainWindow!.webContents.once("did-finish-load", async () => {
-		mainWindow!.webContents.send("images:ready", await updateImageSet());
+		await updateImageSet();
 	});
 });
 
