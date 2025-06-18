@@ -57,7 +57,7 @@ const ViewerCanvas: React.FC<Props> = () => {
 		};
 	}, [loadImages]);
 
-	// Canvas Size Adjustment
+	// Canvas/Window Size Adjustment
 	useEffect(() => {
 		if (images.length === 0) return;
 		const canvas = canvasRef.current;
@@ -67,6 +67,10 @@ const ViewerCanvas: React.FC<Props> = () => {
 		if (img.naturalWidth && img.naturalHeight) {
 			canvas.width = img.naturalWidth;
 			canvas.height = img.naturalHeight;
+			window.electronAPI.syncWindowSizeToComponent({
+				width: img.naturalWidth,
+				height: img.naturalHeight,
+			});
 		}
 	}, [images, index]);
 
