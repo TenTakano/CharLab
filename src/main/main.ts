@@ -142,11 +142,6 @@ ipcMain.on("closeWindow:settings", () => {
 	}
 });
 
-ipcMain.on("set-settings-window-size", (_event, size) => {
-	if (!settingsWindow || settingsWindow.isDestroyed()) return;
-	changeWindowSize(settingsWindow, size);
-});
-
 app.commandLine.appendSwitch("enable-logging");
 app.whenReady().then(async () => {
 	mainWindow = createMainWindow();

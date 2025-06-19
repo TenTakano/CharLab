@@ -28,7 +28,6 @@ declare global {
 			// Settings window
 			openSettingsWindow: () => void;
 			closeSettingsWindow: () => void;
-			setSettingsWindowSize: (size: { width: number; height: number }) => void;
 		};
 	}
 }
@@ -109,8 +108,4 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	openSettingsWindow: () => ipcRenderer.send("openWindow:settings"),
 
 	closeSettingsWindow: () => ipcRenderer.send("closeWindow:settings"),
-
-	setSettingsWindowSize: (size: { width: number; height: number }) => {
-		ipcRenderer.send("set-settings-window-size", size);
-	},
 });
