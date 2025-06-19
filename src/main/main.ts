@@ -124,6 +124,10 @@ ipcMain.on("images:changeSource", async () => {
 	}
 });
 
+ipcMain.on("app:quit", () => {
+	app.quit();
+});
+
 ipcMain.on("openWindow:settings", () => {
 	if (!mainWindow) return;
 

@@ -42,6 +42,11 @@ const App: React.FC = () => {
 		window.electronAPI.closeContextWindow();
 	};
 
+	const handleQuiteApp = () => {
+		window.electronAPI.quitApp();
+		window.electronAPI.closeContextWindow();
+	};
+
 	return (
 		<div ref={containerRef} className={style.container}>
 			<button type="button" onClick={handleSelectFolder}>
@@ -52,6 +57,9 @@ const App: React.FC = () => {
 			</button>
 			<button type="button" onClick={handleSettings}>
 				設定
+			</button>
+			<button type="button" onClick={handleQuiteApp}>
+				アプリを終了する
 			</button>
 		</div>
 	);
