@@ -27,7 +27,7 @@ const App: React.FC = () => {
 	}, []);
 
 	const handleSelectFolder = () => {
-		// To be implemented: Handle folder selection
+		window.electronAPI.changeSource();
 		window.electronAPI.closeContextWindow();
 	};
 
