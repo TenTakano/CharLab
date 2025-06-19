@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // import { useImageCanvas } from "@ui/hooks/useImageCanvas";
 import ViewerCanvas from "@ui/components/ViewerCanvas";
@@ -10,6 +10,18 @@ const App: React.FC = () => {
 	const canvasRef = useRef<ViewerCanvasHandle>(null);
 	const isMovingWindow = useRef(false);
 	const lastScreen = useRef({ x: 0, y: 0 });
+
+	const [error, setError] = useState<string | null>(null);
+
+	useEffect(() => {
+		const unsubscribe = window.electronAPI.onError((error: string) => {
+			setError(error);
+		});
+
+		return () => {
+			unsubscribe();
+		};
+	}, []);
 
 	const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
 		e.preventDefault();
@@ -53,18 +65,13 @@ const App: React.FC = () => {
 			onMouseUp={handleMouseUp}
 			onMouseLeave={handleMouseUp}
 		>
-			{/* <canvas ref={canvasRef} className="w-full h-full block" />
-			{loading && (
-				<div className="absolute inset-0 z-10 flex items-center justify-center">
-					<div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
-				</div>
-			)} */}
 			<ViewerCanvas
 				ref={canvasRef}
 				handleCursorChange={(cursor: string) => {
 					wrapperRef.current!.style.cursor = cursor;
 				}}
 			/>
+			{error && <div className={style.errorBox}>{error}</div>}
 		</div>
 	);
 };
