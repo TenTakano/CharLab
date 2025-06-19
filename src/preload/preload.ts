@@ -1,6 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
 
-import type { SelectFolderResult } from "@/common/type";
 import type { Settings } from "@main/settings";
 
 declare global {

@@ -1,6 +1,5 @@
 import { BrowserWindow, app, dialog, ipcMain } from "electron";
 
-import type { SelectFolderResult } from "@/common/type";
 import { createContextWindow } from "@main/windows/contextWindow";
 import { createMainWindow } from "@main/windows/mainWindow";
 import { createSettingsWindow } from "@main/windows/settingsWindow";
