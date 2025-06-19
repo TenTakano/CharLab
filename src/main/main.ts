@@ -54,8 +54,6 @@ ipcMain.on("settings:set", (_event, settings: Partial<Settings>) => {
 ipcMain.on(
 	"syncWindowSizeToComponent",
 	(event, size: { width: number; height: number }) => {
-		if (!mainWindow || mainWindow.isDestroyed()) return;
-
 		const senderWin = BrowserWindow.fromWebContents(event.sender);
 		if (senderWin) {
 			changeWindowSize(senderWin, size);

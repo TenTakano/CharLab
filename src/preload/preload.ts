@@ -6,7 +6,7 @@ declare global {
 	interface Window {
 		electronAPI: {
 			// common
-			getSettings: () => Settings;
+			getSettings: () => Promise<Settings>;
 			setSettings: (settings: Partial<Settings>) => void;
 			onSettingsUpdates: (callback: (settings: Settings) => void) => () => void;
 			syncWindowSizeToComponent: (size: {
