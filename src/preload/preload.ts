@@ -24,6 +24,7 @@ declare global {
 			openContextWindow: (cursorPosition: { x: number; y: number }) => void;
 			closeContextWindow: () => void;
 			changeSource: () => void;
+			quitApp: () => void;
 
 			// Settings window
 			openSettingsWindow: () => void;
@@ -103,6 +104,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	closeContextWindow: () => ipcRenderer.send("closeWindow:context"),
 
 	changeSource: () => ipcRenderer.send("images:changeSource"),
+
+	quitApp: () => ipcRenderer.send("app:quit"),
 
 	// Settings window related APIs
 	openSettingsWindow: () => ipcRenderer.send("openWindow:settings"),
