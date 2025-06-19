@@ -101,17 +101,22 @@ ipcMain.on("closeWindow:context", () => {
 });
 
 ipcMain.on("images:changeSource", async () => {
-	const { canceled, filePaths } = await dialog.showOpenDialog({
-		properties: ["openDirectory"],
-	});
-	if (canceled || filePaths.length === 0) return;
+	try {
+		const { canceled, filePaths } = await dialog.showOpenDialog({
+			properties: ["openDirectory"],
+		});
+		if (canceled || filePaths.length === 0) return;
 
-	mainWindow?.webContents.send("images:startToGenerateCache");
-	const folder = filePaths[0];
-	await cacheFiles(folder);
-	const { width, height } = getWindowSize();
-	await generateResizedCache(width, height);
-	await updateImageSet();
+		mainWindow?.webContents.send("images:startToGenerateCache");
+		const folder = filePaths[0];
+		await cacheFiles(folder);
+		const { width, height } = getWindowSize();
+		await generateResizedCache(width, height);
+		await updateImageSet();
+	} catch (error) {
+		console.error("Error changing source folder:", error);
+		mainWindow?.webContents.send("onError", "画像の読み込みに失敗しました。");
+	}
 });
 
 ipcMain.on("openWindow:settings", () => {

@@ -19,6 +19,7 @@ declare global {
 			onImagesReady: (callback: (images: string[]) => void) => () => void;
 			onStartToGenerateCache: (callback: () => void) => () => void;
 			moveWindow: (delta: { dx: number; dy: number }) => void;
+			onError: (callback: (error: string) => void) => () => void;
 
 			// Context window
 			openContextWindow: (cursorPosition: { x: number; y: number }) => void;
@@ -84,6 +85,17 @@ contextBridge.exposeInMainWorld("electronAPI", {
 
 	moveWindow: (delta: { dx: number; dy: number }) => {
 		ipcRenderer.send("move-window", delta);
+	},
+
+	onError: (callback: (error: string) => void) => {
+		const listener = (_event: Electron.IpcRendererEvent, error: string) => {
+			callback(error);
+		};
+		ipcRenderer.on("onError", listener);
+
+		return () => {
+			ipcRenderer.removeListener("onError", listener);
+		};
 	},
 
 	// Context window related APIs
