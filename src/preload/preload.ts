@@ -18,8 +18,6 @@ declare global {
 			// Main window
 			onImagesReady: (callback: (images: string[]) => void) => () => void;
 			onStartToGenerateCache: (callback: () => void) => () => void;
-			onFolderChanged: (callback: () => void) => void;
-			selectFolder: () => Promise<SelectFolderResult>;
 			moveWindow: (delta: { dx: number; dy: number }) => void;
 
 			// Context window
@@ -83,14 +81,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
 			ipcRenderer.removeListener("images:startToGenerateCache", listener);
 		};
 	},
-
-	onFolderChanged: (callback: () => void) => {
-		ipcRenderer.on("folder-changed", () => {
-			callback();
-		});
-	},
-
-	selectFolder: () => ipcRenderer.invoke("select-folder"),
 
 	moveWindow: (delta: { dx: number; dy: number }) => {
 		ipcRenderer.send("move-window", delta);

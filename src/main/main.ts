@@ -61,23 +61,6 @@ ipcMain.on(
 	},
 );
 
-ipcMain.handle("select-folder", async (): Promise<SelectFolderResult> => {
-	const { canceled, filePaths } = await dialog.showOpenDialog({
-		properties: ["openDirectory"],
-	});
-	if (canceled || filePaths.length === 0) {
-		return { canceled: true };
-	}
-
-	const win = BrowserWindow.getAllWindows()[0];
-	win.webContents.send("folder-changed");
-	const folder = filePaths[0];
-	await cacheFiles(folder);
-	const { width, height } = getWindowSize();
-	await generateResizedCache(width, height);
-	return { canceled: false, files: await loadCachedImages() };
-});
-
 ipcMain.on("move-window", (event, delta: { dx: number; dy: number }) => {
 	const win = BrowserWindow.fromWebContents(event.sender);
 	if (win) {
