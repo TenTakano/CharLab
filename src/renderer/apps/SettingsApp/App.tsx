@@ -46,9 +46,9 @@ const App: React.FC = () => {
 		if (!el) return;
 
 		const rect = el.getBoundingClientRect();
-		window.electronAPI.setSettingsWindowSize({
-			width: Math.ceil(rect.width),
-			height: Math.ceil(rect.height),
+		window.electronAPI.syncWindowSizeToComponent({
+			width: rect.width,
+			height: rect.height,
 		});
 	}, []);
 

@@ -54,8 +54,6 @@ ipcMain.on("settings:set", (_event, settings: Partial<Settings>) => {
 ipcMain.on(
 	"syncWindowSizeToComponent",
 	(event, size: { width: number; height: number }) => {
-		if (!mainWindow || mainWindow.isDestroyed()) return;
-
 		const senderWin = BrowserWindow.fromWebContents(event.sender);
 		if (senderWin) {
 			changeWindowSize(senderWin, size);
@@ -142,11 +140,6 @@ ipcMain.on("closeWindow:settings", () => {
 	if (settingsWindow && !settingsWindow.isDestroyed()) {
 		settingsWindow.hide();
 	}
-});
-
-ipcMain.on("set-settings-window-size", (_event, size) => {
-	if (!settingsWindow || settingsWindow.isDestroyed()) return;
-	changeWindowSize(settingsWindow, size);
 });
 
 app.commandLine.appendSwitch("enable-logging");

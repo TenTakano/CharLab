@@ -6,7 +6,9 @@ export function changeWindowSize(
 ): void {
 	const allowResize = win.isResizable();
 	if (!allowResize) win.setResizable(true);
-	win.setSize(size.width, size.height);
+	const width = Math.floor(size.width);
+	const height = Math.floor(size.height);
+	win.setSize(width, height);
 	if (!allowResize) win.setResizable(false);
 }
 
