@@ -37,8 +37,16 @@ ipcMain.on("settings:set", (_event, settings: Partial<Settings>) => {
 		(async () => {
 			mainWindow?.webContents.send("images:startToGenerateCache");
 			const windowSize = settings.windowSize!;
-			await generateResizedCache(windowSize.width, windowSize.height);
-			await updateImageSet();
+			try {
+				await generateResizedCache(windowSize.width, windowSize.height);
+				await updateImageSet();
+			} catch (error) {
+				console.error("Error generating resized cache:", error);
+				mainWindow?.webContents.send(
+					"onError",
+					"画像のリサイズに失敗しました。",
+				);
+			}
 		})();
 	}
 	mainWindow?.webContents.send("onSettingsUpdates", settings);
