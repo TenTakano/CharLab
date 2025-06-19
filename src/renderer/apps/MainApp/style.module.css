@@ -1,3 +1,32 @@
 .container {
 	cursor: grab;
 }
+
+.errorBox {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 100;
+  color: #b3261e;
+  background: #fff5f5;
+  border-left: 4px solid #b3261e;
+  border-radius: 0.5em;
+  padding: 1em;
+  font-size: 1em;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px);}
+  to   { opacity: 1; transform: translateY(0);}
+}
+
+.errorBox::before {
+  content: "⚠️";
+  font-size: 1.3em;
+  flex-shrink: 0;
+}

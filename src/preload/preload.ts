@@ -18,13 +18,13 @@ declare global {
 			// Main window
 			onImagesReady: (callback: (images: string[]) => void) => () => void;
 			onStartToGenerateCache: (callback: () => void) => () => void;
-			onFolderChanged: (callback: () => void) => void;
-			selectFolder: () => Promise<SelectFolderResult>;
 			moveWindow: (delta: { dx: number; dy: number }) => void;
+			onError: (callback: (error: string) => void) => () => void;
 
 			// Context window
 			openContextWindow: (cursorPosition: { x: number; y: number }) => void;
 			closeContextWindow: () => void;
+			changeSource: () => void;
 
 			// Settings window
 			openSettingsWindow: () => void;
@@ -83,16 +83,19 @@ contextBridge.exposeInMainWorld("electronAPI", {
 		};
 	},
 
-	onFolderChanged: (callback: () => void) => {
-		ipcRenderer.on("folder-changed", () => {
-			callback();
-		});
-	},
-
-	selectFolder: () => ipcRenderer.invoke("select-folder"),
-
 	moveWindow: (delta: { dx: number; dy: number }) => {
 		ipcRenderer.send("move-window", delta);
+	},
+
+	onError: (callback: (error: string) => void) => {
+		const listener = (_event: Electron.IpcRendererEvent, error: string) => {
+			callback(error);
+		};
+		ipcRenderer.on("onError", listener);
+
+		return () => {
+			ipcRenderer.removeListener("onError", listener);
+		};
 	},
 
 	// Context window related APIs
@@ -100,6 +103,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
 		ipcRenderer.send("openWindow:context", cursorPosition),
 
 	closeContextWindow: () => ipcRenderer.send("closeWindow:context"),
+
+	changeSource: () => ipcRenderer.send("images:changeSource"),
 
 	// Settings window related APIs
 	openSettingsWindow: () => ipcRenderer.send("openWindow:settings"),

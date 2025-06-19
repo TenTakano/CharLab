@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 
 import type { Settings } from "@main/settings";
 import { useSettingsSync } from "@ui/hooks/useSettingsSync";
@@ -27,7 +27,7 @@ const App: React.FC = () => {
 	}, []);
 
 	const handleSelectFolder = () => {
-		// To be implemented: Handle folder selection
+		window.electronAPI.changeSource();
 		window.electronAPI.closeContextWindow();
 	};
 

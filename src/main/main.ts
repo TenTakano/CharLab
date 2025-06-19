@@ -37,8 +37,16 @@ ipcMain.on("settings:set", (_event, settings: Partial<Settings>) => {
 		(async () => {
 			mainWindow?.webContents.send("images:startToGenerateCache");
 			const windowSize = settings.windowSize!;
-			await generateResizedCache(windowSize.width, windowSize.height);
-			await updateImageSet();
+			try {
+				await generateResizedCache(windowSize.width, windowSize.height);
+				await updateImageSet();
+			} catch (error) {
+				console.error("Error generating resized cache:", error);
+				mainWindow?.webContents.send(
+					"onError",
+					"画像のリサイズに失敗しました。",
+				);
+			}
 		})();
 	}
 	mainWindow?.webContents.send("onSettingsUpdates", settings);
@@ -60,23 +68,6 @@ ipcMain.on(
 		}
 	},
 );
-
-ipcMain.handle("select-folder", async (): Promise<SelectFolderResult> => {
-	const { canceled, filePaths } = await dialog.showOpenDialog({
-		properties: ["openDirectory"],
-	});
-	if (canceled || filePaths.length === 0) {
-		return { canceled: true };
-	}
-
-	const win = BrowserWindow.getAllWindows()[0];
-	win.webContents.send("folder-changed");
-	const folder = filePaths[0];
-	await cacheFiles(folder);
-	const { width, height } = getWindowSize();
-	await generateResizedCache(width, height);
-	return { canceled: false, files: await loadCachedImages() };
-});
 
 ipcMain.on("move-window", (event, delta: { dx: number; dy: number }) => {
 	const win = BrowserWindow.fromWebContents(event.sender);
@@ -114,6 +105,25 @@ ipcMain.on(
 ipcMain.on("closeWindow:context", () => {
 	if (contextWindow && !contextWindow.isDestroyed()) {
 		contextWindow.hide();
+	}
+});
+
+ipcMain.on("images:changeSource", async () => {
+	try {
+		const { canceled, filePaths } = await dialog.showOpenDialog({
+			properties: ["openDirectory"],
+		});
+		if (canceled || filePaths.length === 0) return;
+
+		mainWindow?.webContents.send("images:startToGenerateCache");
+		const folder = filePaths[0];
+		await cacheFiles(folder);
+		const { width, height } = getWindowSize();
+		await generateResizedCache(width, height);
+		await updateImageSet();
+	} catch (error) {
+		console.error("Error changing source folder:", error);
+		mainWindow?.webContents.send("onError", "画像の読み込みに失敗しました。");
 	}
 });
 
