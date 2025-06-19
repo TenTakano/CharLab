@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 
 import type { Settings } from "@main/settings";
 import { useSettingsSync } from "@ui/hooks/useSettingsSync";
