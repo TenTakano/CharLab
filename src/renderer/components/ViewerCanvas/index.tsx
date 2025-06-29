@@ -142,19 +142,19 @@ const ViewerCanvas: React.FC<Props> = ({ ref, handleCursorChange }) => {
 	});
 
 	// Mouse Controls
-	const isRotating = useRef(false);
+	const isManualRotating = useRef(false);
 	const startX = useRef(0);
 
 	useImperativeHandle(ref, () => ({
 		onMouseDown: (e) => {
 			if (e.shiftKey || images.length === 0) return;
 
-			isRotating.current = true;
+			isManualRotating.current = true;
 			startX.current = e.clientX;
 			handleCursorChange?.("grabbing");
 		},
 		onMouseMove: (e) => {
-			if (!isRotating.current || images.length === 0) return;
+			if (!isManualRotating.current || images.length === 0) return;
 
 			const deltaX = e.clientX - startX.current;
 			const step = Math.floor(deltaX / 10);
@@ -165,9 +165,9 @@ const ViewerCanvas: React.FC<Props> = ({ ref, handleCursorChange }) => {
 			}
 		},
 		onMouseUp: () => {
-			if (!isRotating.current) return;
+			if (!isManualRotating.current) return;
 
-			isRotating.current = false;
+			isManualRotating.current = false;
 			handleCursorChange?.("grab");
 		},
 	}));

@@ -1,41 +1,57 @@
+import type { Settings } from "@main/settings";
+import { useSettingsSync } from "@ui/hooks/useSettingsSync";
 import { useEffect, useRef, useState } from "react";
 
 type Props = {
-	playing: boolean;
-	fps: number;
-	direction: 1 | -1;
 	imagesLength: number;
-	startIndex?: number;
+	index: number;
+	setIndex: React.Dispatch<React.SetStateAction<number>>;
+	isManualRotating: boolean;
 };
 
 export const useAutoPlayIndex = ({
-	playing,
-	fps,
-	direction,
 	imagesLength,
-	startIndex = 0,
+	index,
+	setIndex,
+	isManualRotating,
 }: Props) => {
-	const [index, setIndex] = useState(startIndex);
+	const [playing, setPlaying] = useState(false);
+	const [direction, setDirection] = useState<1 | -1>(1); // 1 for forward, -1 for backward
+	const [fps, setFps] = useState(30);
 
 	const rafId = useRef<number | null>(null);
 	const start = useRef<number>(performance.now());
-	const baseIx = useRef<number>(startIndex);
+	const baseIx = useRef<number>(index);
+
+	useSettingsSync((settings: Partial<Settings>) => {
+		if (settings.autoPlay !== undefined) {
+			setPlaying(settings.autoPlay);
+		}
+		if (settings.playbackDirection) {
+			setDirection(settings.playbackDirection);
+		}
+		if (settings.fps) {
+			setFps(settings.fps);
+		}
+	});
+
+	const isAutoPlaying = playing && !isManualRotating;
 
 	useEffect(() => {
-		if (!playing) {
+		if (!isAutoPlaying) {
 			if (rafId.current) cancelAnimationFrame(rafId.current);
 			return;
 		}
 
 		start.current = performance.now();
 		baseIx.current = index;
-		const interval = 1000 / fps;
+		const interval = fps > 0 ? 1000 / fps : 1000 / 30;
 
 		const animate = (now: number) => {
 			const passed = Math.floor((now - start.current) / interval);
 			const nextIndex =
 				(baseIx.current + passed * direction + imagesLength) % imagesLength;
-			setIndex((prev) => (prev === nextIndex ? prev : nextIndex));
+			setIndex((prev: number) => (prev === nextIndex ? prev : nextIndex));
 
 			rafId.current = requestAnimationFrame(animate);
 		};
@@ -45,7 +61,5 @@ export const useAutoPlayIndex = ({
 		return () => {
 			if (rafId.current) cancelAnimationFrame(rafId.current);
 		};
-	}, [playing, fps, direction, imagesLength]); // index is not included to avoid unnecessary re-renders
-
-	return index;
+	}, [isAutoPlaying, fps, direction, imagesLength]); // index is not included to avoid unnecessary re-renders
 };
