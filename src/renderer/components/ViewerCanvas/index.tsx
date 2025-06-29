@@ -1,8 +1,7 @@
 import { useEffect, useImperativeHandle, useRef, useState } from "react";
 
-import type { Settings } from "@main/settings";
 import noImage from "@ui/assets/noimage.svg";
-import { useSettingsSync } from "@ui/hooks/useSettingsSync";
+import { useAutoPlayIndex } from "./AutoPlayHook";
 import style from "./style.module.css";
 import type { ViewerCanvasHandle } from "./types";
 
@@ -101,60 +100,20 @@ const ViewerCanvas: React.FC<Props> = ({ ref, handleCursorChange }) => {
 		}
 	}, [images, index]);
 
-	// Animation Logic
-	const [fps, setFps] = useState(30);
-	const [playing, setPlaying] = useState(false);
-	const [direction, setDirection] = useState(1); // 1 for forward, -1 for backward
-
-	useEffect(() => {
-		if (!playing || images.length === 0) return;
-
-		let frameId: number;
-		let lastFrameTime = performance.now();
-
-		const animate = (time: number) => {
-			const elapsed = time - lastFrameTime;
-			if (elapsed > 1000 / fps) {
-				setIndex((prev) => (prev + direction + images.length) % images.length);
-				lastFrameTime = time;
-			}
-			frameId = requestAnimationFrame(animate);
-		};
-
-		frameId = requestAnimationFrame(animate);
-
-		return () => {
-			cancelAnimationFrame(frameId);
-		};
-	}, [playing, images.length, fps, direction]);
-
-	// Settings Loading
-	useSettingsSync((settings: Partial<Settings>) => {
-		if (settings.autoPlay !== undefined) {
-			setPlaying(settings.autoPlay);
-		}
-		if (settings.playbackDirection) {
-			setDirection(settings.playbackDirection);
-		}
-		if (settings.fps) {
-			setFps(settings.fps);
-		}
-	});
-
 	// Mouse Controls
-	const isManualRotating = useRef(false);
+	const [isManualRotating, setIsManualRotating] = useState(false);
 	const startX = useRef(0);
 
 	useImperativeHandle(ref, () => ({
 		onMouseDown: (e) => {
 			if (e.shiftKey || images.length === 0) return;
 
-			isManualRotating.current = true;
+			setIsManualRotating(true);
 			startX.current = e.clientX;
 			handleCursorChange?.("grabbing");
 		},
 		onMouseMove: (e) => {
-			if (!isManualRotating.current || images.length === 0) return;
+			if (!isManualRotating || images.length === 0) return;
 
 			const deltaX = e.clientX - startX.current;
 			const step = Math.floor(deltaX / 10);
@@ -165,12 +124,20 @@ const ViewerCanvas: React.FC<Props> = ({ ref, handleCursorChange }) => {
 			}
 		},
 		onMouseUp: () => {
-			if (!isManualRotating.current) return;
+			if (!isManualRotating) return;
 
-			isManualRotating.current = false;
+			setIsManualRotating(false);
 			handleCursorChange?.("grab");
 		},
 	}));
+
+	// Auto Play Hook
+	useAutoPlayIndex({
+		imagesLength: images.length,
+		index,
+		setIndex,
+		isManualRotating,
+	});
 
 	return (
 		<>
