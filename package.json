@@ -1,6 +1,6 @@
 {
 	"name": "charlab",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"description": "キャラクターの360度画像を用いて、擬似的に3Dモデル風の表示を実現するソフトウェアです。",
 	"main": "dist/main.js",
 	"scripts": {
