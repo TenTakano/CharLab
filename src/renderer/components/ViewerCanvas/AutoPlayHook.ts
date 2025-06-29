@@ -2,6 +2,8 @@ import type { Settings } from "@main/settings";
 import { useSettingsSync } from "@ui/hooks/useSettingsSync";
 import { useEffect, useRef, useState } from "react";
 
+const safeMod = (a: number, b: number): number => ((a % b) + b) % b;
+
 type Props = {
 	imagesLength: number;
 	index: number;
@@ -49,8 +51,10 @@ export const useAutoPlayIndex = ({
 
 		const animate = (now: number) => {
 			const passed = Math.floor((now - start.current) / interval);
-			const nextIndex =
-				(baseIx.current + passed * direction + imagesLength) % imagesLength;
+			const nextIndex = safeMod(
+				baseIx.current + passed * direction,
+				imagesLength,
+			);
 			setIndex((prev: number) => (prev === nextIndex ? prev : nextIndex));
 
 			rafId.current = requestAnimationFrame(animate);
