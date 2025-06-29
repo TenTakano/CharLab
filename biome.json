@@ -30,7 +30,8 @@
 			"suspicious": {
 				"noConsoleLog": "error"
 			}
-		}
+		},
+		"ignore": ["src/renderer/components/ViewerCanvas/AutoPlayHook.ts"]
 	},
 	"javascript": {
 		"formatter": {

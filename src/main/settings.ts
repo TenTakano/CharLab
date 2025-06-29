@@ -6,7 +6,7 @@ export interface Settings {
 	windowPosition: { x: number; y: number };
 	dirPath: string;
 	autoPlay: boolean;
-	playbackDirection: number; // 1 for forward, -1 for backward
+	playbackDirection: 1 | -1; // 1 for forward, -1 for backward
 	fps: number;
 }
 
