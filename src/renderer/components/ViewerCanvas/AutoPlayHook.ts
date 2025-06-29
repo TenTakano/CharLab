@@ -15,7 +15,7 @@ export const useAutoPlayIndex = ({
 	imagesLength,
 	startIndex = 0,
 }: Props) => {
-	const [index, setIndex] = useState(0);
+	const [index, setIndex] = useState(startIndex);
 
 	const rafId = useRef<number | null>(null);
 	const start = useRef<number>(performance.now());
