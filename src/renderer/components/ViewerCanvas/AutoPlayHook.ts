@@ -26,12 +26,10 @@ export const useAutoPlayIndex = ({
 	const baseIx = useRef<number>(index);
 
 	const handleSettingsUpdate = useCallback((settings: Partial<Settings>) => {
-		console.log("AutoPlayHook received settings:", JSON.stringify(settings));
 		if (settings.autoPlay !== undefined) {
 			setPlaying(settings.autoPlay);
 		}
 		if (settings.playbackDirection !== undefined) {
-			console.log("Setting direction to:", settings.playbackDirection);
 			setDirection(settings.playbackDirection);
 		}
 		if (settings.fps !== undefined) {

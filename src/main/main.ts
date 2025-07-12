@@ -31,7 +31,6 @@ const updateImageSet = async () => {
 ipcMain.handle("settings:getAll", () => getSettings());
 
 ipcMain.on("settings:set", (_event, settings: Partial<Settings>) => {
-	console.log("Settings received:", settings);
 	setSettings(settings);
 	if (settings.windowSize) {
 		(async () => {
@@ -49,7 +48,6 @@ ipcMain.on("settings:set", (_event, settings: Partial<Settings>) => {
 			}
 		})();
 	}
-	console.log("Sending settings update:", settings);
 	mainWindow?.webContents.send("onSettingsUpdates", settings);
 });
 

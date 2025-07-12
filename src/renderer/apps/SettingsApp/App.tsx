@@ -39,6 +39,13 @@ const App: React.FC = () => {
 		};
 
 		fetchSettings();
+
+		const handleFocus = () => {
+			fetchSettings();
+		};
+
+		window.addEventListener("focus", handleFocus);
+		return () => window.removeEventListener("focus", handleFocus);
 	}, []);
 
 	useLayoutEffect(() => {
