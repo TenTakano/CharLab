@@ -1,6 +1,6 @@
 import type { Settings } from "@main/settings";
 import { useSettingsSync } from "@ui/hooks/useSettingsSync";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const safeMod = (a: number, b: number): number => ((a % b) + b) % b;
 
@@ -25,17 +25,19 @@ export const useAutoPlayIndex = ({
 	const start = useRef<number>(performance.now());
 	const baseIx = useRef<number>(index);
 
-	useSettingsSync((settings: Partial<Settings>) => {
+	const handleSettingsUpdate = useCallback((settings: Partial<Settings>) => {
 		if (settings.autoPlay !== undefined) {
 			setPlaying(settings.autoPlay);
 		}
-		if (settings.playbackDirection) {
+		if (settings.playbackDirection !== undefined) {
 			setDirection(settings.playbackDirection);
 		}
-		if (settings.fps) {
+		if (settings.fps !== undefined) {
 			setFps(settings.fps);
 		}
-	});
+	}, []);
+
+	useSettingsSync(handleSettingsUpdate);
 
 	const isAutoPlaying = playing && !isManualRotating;
 
